@@ -165,6 +165,39 @@
   .divider { height:1px; background:var(--border); margin:28px 0; }
   .footer-note { text-align:center; font-family:var(--mono); font-size:.68rem; color:var(--muted); }
 
+  /* FEED DE GASTOS */
+  .feed-wrap { background:var(--surface); border:1px solid var(--border); border-radius:12px; margin-bottom:28px; overflow:hidden; }
+  .feed-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border); background:#faf9f6; }
+  .feed-title { font-size:.82rem; font-weight:700; display:flex; align-items:center; gap:8px; }
+  .feed-totals { display:flex; gap:14px; align-items:center; }
+  .feed-total { font-family:var(--mono); font-size:.75rem; }
+  .feed-body { max-height:320px; overflow-y:auto; }
+  .feed-empty { padding:28px; text-align:center; color:var(--muted); font-size:.85rem; font-style:italic; }
+  .feed-item { display:flex; align-items:center; gap:12px; padding:10px 18px; border-bottom:1px solid var(--border); transition:background .12s; }
+  .feed-item:last-child { border-bottom:none; }
+  .feed-item:hover { background:#faf9f6; }
+  .feed-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0; }
+  .feed-icon.out { background:var(--danger-light); }
+  .feed-icon.in  { background:var(--accent-light); }
+  .feed-info { flex:1; min-width:0; }
+  .feed-desc { font-size:.86rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .feed-meta { font-family:var(--mono); font-size:.68rem; color:var(--muted); margin-top:1px; }
+  .feed-val { font-family:var(--mono); font-size:.9rem; font-weight:500; white-space:nowrap; }
+  .feed-val.out { color:var(--danger); }
+  .feed-val.in  { color:var(--accent); }
+  .feed-del { background:none; border:none; color:#ccc; cursor:pointer; padding:3px 6px; border-radius:4px; transition:all .15s; font-size:.9rem; }
+  .feed-del:hover { color:var(--danger); background:var(--danger-light); }
+  .feed-footer { padding:10px 18px; border-top:1px solid var(--border); display:flex; gap:8px; }
+  .feed-quick-input { flex:1; font-family:var(--mono); font-size:.8rem; padding:7px 10px; border:1px solid var(--border2); border-radius:6px; background:var(--bg); color:var(--text); outline:none; }
+  .feed-quick-input:focus { border-color:var(--accent); background:#fff; }
+  .feed-quick-val { width:110px; font-family:var(--mono); font-size:.8rem; padding:7px 10px; border:1px solid var(--border2); border-radius:6px; background:var(--bg); color:var(--text); outline:none; }
+  .feed-quick-val:focus { border-color:var(--accent); background:#fff; }
+  .feed-quick-btn { padding:7px 14px; border-radius:6px; border:none; font-family:var(--mono); font-size:.75rem; font-weight:500; cursor:pointer; transition:all .15s; white-space:nowrap; }
+  .feed-quick-btn.out { background:var(--danger-light); color:var(--danger); }
+  .feed-quick-btn.out:hover { background:var(--danger); color:#fff; }
+  .feed-quick-btn.in  { background:var(--accent-light); color:var(--accent); }
+  .feed-quick-btn.in:hover  { background:var(--accent); color:#fff; }
+
   /* DAILY MOVEMENTS */
   .daily-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
   .daily-col-title { font-family:var(--mono); font-size:.68rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
@@ -221,6 +254,27 @@
     <span class="page-emoji" id="pageEmoji" onclick="cycleEmoji()">💰</span>
     <div class="page-title" contenteditable="true" id="pageTitle" spellcheck="false">Finanças Pessoais</div>
     <div class="page-sub" contenteditable="true" id="pageSub" spellcheck="false">Meu controle financeiro mensal · clique em qualquer campo para editar</div>
+  </div>
+
+  <!-- FEED DE GASTOS DO DIA -->
+  <div class="feed-wrap">
+    <div class="feed-header">
+      <div class="feed-title">📋 Registro do dia <span style="font-family:var(--mono);font-size:.68rem;color:var(--muted);font-weight:400" id="feed-date"></span></div>
+      <div class="feed-totals">
+        <span class="feed-total red" id="feed-out-sum">−R$ 0,00</span>
+        <span style="color:var(--border2)">|</span>
+        <span class="feed-total green" id="feed-in-sum">+R$ 0,00</span>
+      </div>
+    </div>
+    <div class="feed-body" id="feedBody">
+      <div class="feed-empty" id="feedEmpty">Nenhum registro hoje ainda.<br>Use os campos abaixo para lançar rapidinho.</div>
+    </div>
+    <div class="feed-footer">
+      <input class="feed-quick-input" id="fq-desc" placeholder="O que foi? (ex: Almoço, Uber...)" onkeydown="fqKey(event)" />
+      <input class="feed-quick-val" id="fq-val" type="number" step="0.01" placeholder="R$ 0,00" onkeydown="fqKey(event)" />
+      <button class="feed-quick-btn out" onclick="fqAdd('out')">− Gasto</button>
+      <button class="feed-quick-btn in"  onclick="fqAdd('in')">+ Extra</button>
+    </div>
   </div>
 
   <!-- MONTH TABS -->
@@ -1089,6 +1143,111 @@ function saveCartao() {
 }
 
 // ═══════════════════════════════════════════════
+// FEED RÁPIDO DO DIA
+// ═══════════════════════════════════════════════
+function feedKey() {
+  // Chave do dia: ex "feed_2026-04-10"
+  const d = new Date();
+  return 'feed_' + d.toISOString().slice(0,10);
+}
+function getFeedItems() {
+  try { return JSON.parse(localStorage.getItem(feedKey()) || '[]'); } catch(e) { return []; }
+}
+function saveFeedItems(items) {
+  localStorage.setItem(feedKey(), JSON.stringify(items));
+}
+
+function renderFeed() {
+  const items = getFeedItems();
+  const body  = document.getElementById('feedBody');
+  const empty = document.getElementById('feedEmpty');
+  const outSum = document.getElementById('feed-out-sum');
+  const inSum  = document.getElementById('feed-in-sum');
+  const dateEl = document.getElementById('feed-date');
+
+  // Date label
+  const now = new Date();
+  if(dateEl) dateEl.textContent = now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+
+  if(!body) return;
+
+  const totalOut = items.filter(x=>x.tipo==='out').reduce((s,x)=>s+x.valor,0);
+  const totalIn  = items.filter(x=>x.tipo==='in').reduce((s,x)=>s+x.valor,0);
+  if(outSum) outSum.textContent = '−'+fmtBRL(totalOut);
+  if(inSum)  inSum.textContent  = '+'+fmtBRL(totalIn);
+
+  if(items.length === 0) {
+    if(empty) empty.style.display = 'block';
+    // Remove all feed items except empty
+    body.querySelectorAll('.feed-item').forEach(el=>el.remove());
+    return;
+  }
+  if(empty) empty.style.display = 'none';
+
+  // Rebuild list (newest first)
+  body.querySelectorAll('.feed-item').forEach(el=>el.remove());
+  [...items].reverse().forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'feed-item';
+    div.innerHTML = `
+      <div class="feed-icon ${item.tipo}">${item.tipo==='out'?'💸':'💰'}</div>
+      <div class="feed-info">
+        <div class="feed-desc">${item.desc}</div>
+        <div class="feed-meta">${item.hora} · ${item.tipo==='out'?'Gasto':'Recebimento extra'}</div>
+      </div>
+      <div class="feed-val ${item.tipo}">${item.tipo==='out'?'−':'+'}${fmtBRL(item.valor)}</div>
+      <button class="feed-del" onclick="feedDel('${item.id}')">×</button>`;
+    body.appendChild(div);
+  });
+}
+
+function fqAdd(tipo) {
+  const desc  = document.getElementById('fq-desc').value.trim();
+  const valor = parseFloat(document.getElementById('fq-val').value) || 0;
+  if(!desc || !valor) {
+    document.getElementById(desc ? 'fq-val' : 'fq-desc').focus();
+    return;
+  }
+  const now   = new Date();
+  const hora  = now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const items = getFeedItems();
+  items.push({ id:uid(), tipo, desc, valor, hora });
+  saveFeedItems(items);
+
+  // Também registra nos movimentos do mês ativo
+  const m = state.activeMonth;
+  getMovimentos(m).push({ id:uid(), tipo, desc, valor, dia: String(now.getDate()) });
+
+  // Limpa inputs
+  document.getElementById('fq-desc').value = '';
+  document.getElementById('fq-val').value  = '';
+  document.getElementById('fq-desc').focus();
+
+  renderFeed();
+  calcAll();
+}
+
+function fqKey(e) {
+  if(e.key === 'Enter') {
+    // Se desc preenchida e valor vazio, vai pro valor
+    const desc  = document.getElementById('fq-desc').value.trim();
+    const valor = document.getElementById('fq-val').value;
+    if(desc && !valor) { document.getElementById('fq-val').focus(); return; }
+    fqAdd('out'); // Enter registra como gasto por padrão
+  }
+}
+
+function feedDel(id) {
+  const items = getFeedItems().filter(x=>x.id!==id);
+  saveFeedItems(items);
+  // Remove também dos movimentos do mês
+  const m = state.activeMonth;
+  if(state.movimentos[m]) state.movimentos[m] = state.movimentos[m].filter(x=>x.id!==id);
+  renderFeed();
+  calcAll();
+}
+
+// ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
 function init() {
@@ -1098,6 +1257,7 @@ function init() {
   document.getElementById('pageEmoji').textContent = state.emoji || '💰';
   renderMonthNav();
   renderMonthContent(state.activeMonth);
+  renderFeed();
 }
 
 init();
