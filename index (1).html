@@ -128,12 +128,16 @@
   .tbl-wrap { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; margin-bottom:4px; overflow-x:auto; }
   table.nt { width:100%; border-collapse:collapse; font-size:.86rem; min-width:500px; }
   table.nt thead th { background:#f3f1eb; padding:8px 12px; text-align:left; font-family:var(--mono); font-size:.62rem; color:var(--muted); letter-spacing:.07em; text-transform:uppercase; border-bottom:1px solid var(--border); white-space:nowrap; }
-  table.nt td { padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
   table.nt tr:last-child td { border-bottom:none; }
   table.nt tr:hover td { background:#faf9f6; }
 
-  [contenteditable=true] { outline:none; cursor:text; min-width:40px; display:inline-block; }
+  [contenteditable=true] { outline:none; cursor:text; min-width:40px; display:block; width:100%; }
   [contenteditable=true]:focus { background:#fffde7; border-radius:3px; box-shadow:inset 0 0 0 1.5px #f5d060; }
+
+  /* Cells with numbers don't wrap */
+  table.nt td { padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:middle; white-space:nowrap; }
+  table.nt td:first-child { white-space:normal; min-width:140px; max-width:260px; }
+  table.nt td .mono { white-space:nowrap; }
 
   .mono { font-family:var(--mono); font-size:.8rem; }
   .green { color:var(--accent); }
@@ -656,7 +660,7 @@ function readDOMIntoState() {
   // Salários
   state.salarios[m] = [];
   document.querySelectorAll('#tbl-sal tbody tr').forEach(tr => {
-    const c = tr.querySelectorAll('[contenteditable]');
+    const c = tr.querySelectorAll('td div[contenteditable], td[contenteditable]');
     if(c.length>=4) state.salarios[m].push({
       id: tr.dataset.id||uid(),
       desc: c[0].innerText, valor: c[1].innerText,
@@ -667,7 +671,7 @@ function readDOMIntoState() {
   // Dívidas fixas
   state.dividasFixas[m] = [];
   document.querySelectorAll('#tbl-dfix tbody tr').forEach(tr => {
-    const c = tr.querySelectorAll('[contenteditable]');
+    const c = tr.querySelectorAll('td div[contenteditable], td[contenteditable]');
     const sels = tr.querySelectorAll('select');
     if(c.length>=3) state.dividasFixas[m].push({
       id: tr.dataset.id||uid(),
@@ -900,11 +904,11 @@ function cartaoBlock(m, key, label) {
 // ═══════════════════════════════════════════════
 function rowSal(s) {
   return `<tr data-id="${s.id||uid()}">
-    <td contenteditable="true" oninput="calcAll()">${s.desc}</td>
-    <td contenteditable="true" class="mono green" oninput="calcAll()">${s.valor}</td>
-    <td contenteditable="true" class="mono gray" oninput="calcAll()">${s.dia}</td>
-    <td contenteditable="true" class="gray" style="font-size:.8rem" oninput="calcAll()">${s.obs||''}</td>
-    <td><button class="del-btn" onclick="delSalRow(this)">×</button></td>
+    <td><div contenteditable="true" oninput="calcAll()">${s.desc}</div></td>
+    <td style="width:130px"><div contenteditable="true" class="mono green" oninput="calcAll()">${s.valor}</div></td>
+    <td style="width:80px"><div contenteditable="true" class="mono gray" oninput="calcAll()">${s.dia}</div></td>
+    <td><div contenteditable="true" class="gray" style="font-size:.8rem" oninput="calcAll()">${s.obs||''}</div></td>
+    <td style="width:36px"><button class="del-btn" onclick="delSalRow(this)">×</button></td>
   </tr>`;
 }
 
@@ -914,12 +918,12 @@ function rowDfix(d) {
   const stOpts = ['pendente','pago','atrasado'].map(s=>`<option${s===d.status?' selected':''}>${s}</option>`).join('');
   const stCls = d.status==='pago'?'tag-green':d.status==='atrasado'?'tag-red':'tag-yellow';
   return `<tr data-id="${d.id||uid()}">
-    <td contenteditable="true" oninput="calcAll()">${d.desc}</td>
-    <td contenteditable="true" class="mono red" oninput="calcAll()">${d.valor}</td>
-    <td contenteditable="true" class="mono gray" oninput="calcAll()">${d.dia}</td>
-    <td><select class="isel" onchange="calcAll()">${catOpts}</select></td>
-    <td><select class="isel tag ${stCls}" onchange="updateStTag(this)">${stOpts}</select></td>
-    <td><button class="del-btn" onclick="delDfixRow(this)">×</button></td>
+    <td><div contenteditable="true" oninput="calcAll()">${d.desc}</div></td>
+    <td style="width:130px"><div contenteditable="true" class="mono red" oninput="calcAll()">${d.valor}</div></td>
+    <td style="width:80px"><div contenteditable="true" class="mono gray" oninput="calcAll()">${d.dia}</div></td>
+    <td style="width:140px"><select class="isel" onchange="calcAll()">${catOpts}</select></td>
+    <td style="width:110px"><select class="isel tag ${stCls}" onchange="updateStTag(this)">${stOpts}</select></td>
+    <td style="width:36px"><button class="del-btn" onclick="delDfixRow(this)">×</button></td>
   </tr>`;
 }
 
@@ -965,8 +969,12 @@ function delInstallment(id) {
 function sumTableCol(tableId, colIdx) {
   let t = 0;
   document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
-    const cells = tr.querySelectorAll('[contenteditable]');
-    if(cells[colIdx]) t += parseVal(cells[colIdx].innerText);
+    const cells = tr.querySelectorAll('td');
+    if(cells[colIdx]) {
+      const div = cells[colIdx].querySelector('div[contenteditable]');
+      const txt = div ? div.innerText : cells[colIdx].innerText;
+      t += parseVal(txt);
+    }
   });
   return t;
 }
