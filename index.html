@@ -379,6 +379,8 @@ input[type="month"]:focus{border-color:var(--g);background:#fff;}
  <div class="fbs"></div>
  <button class="fbb" onclick="saveAll()">Salvar</button>
  <div class="fbs"></div>
+ <button class="fbb" style="color:#e88;" onclick="resetAll()">Zerar dados</button>
+ <div class="fbs"></div>
  <span class="fbsv" id="svmsg">salvo</span>
 </div>
 
@@ -567,9 +569,8 @@ function showVw(n,el){
  if(n==='metas')renderMetas();
 }
 function fullRender(){
- document.getElementById('pt').innerText=state.pageTitle||'VitFinance';
+ document.getElementById('pt').innerHTML='<span class="vit">Vit</span><span class="fin">Finance</span>';
  document.getElementById('ps').innerText=state.pageSub||'';
- 
  renderMNav();renderMC(state.activeMonth);renderFeed();
  const av=document.querySelector('.vw.on');
  if(av?.id==='vw-vg')renderVG();
@@ -990,14 +991,55 @@ function savMeta(){
 }
 function mtTipo(){const t=document.getElementById('mtt').value;const r=document.getElementById('mtarow');if(r)r.style.opacity=t==='investimento'?'0.4':'1';}
 
-// INIT 
+// RESET
+function freshState(){
+  return {
+    months:['Abril 2026'],
+    activeMonth:'Abril 2026',
+    pageTitle:'VitFinance',
+    pageSub:'Meu controle financeiro pessoal',
+    salarios:{},dividasFixas:{},installments:[],statusMap:{},movimentos:{},aportes:[],metas:[]
+  };
+}
+function resetAll(){
+  if(!confirm('Apagar todos os dados e começar do zero?'))return;
+  state=freshState();
+  localStorage.removeItem('vf1');
+  // Also clear feed
+  localStorage.removeItem(feedK());
+  if(window._fbSave)window._fbSave(state);
+  fullRender();
+  toast('Dados zerados com sucesso');
+}
+
+// INIT
 function init(){
- const raw=localStorage.getItem('vf1');if(raw)try{state=JSON.parse(raw);}catch(e){}
- document.getElementById('pt').innerText=state.pageTitle||'VitFinance';
- document.getElementById('ps').innerText=state.pageSub||'Meu controle financeiro pessoal';
- 
- renderMNav();renderMC(state.activeMonth);renderFeed();
- if(window._fbLoad){window._fbLoad().then(r=>{if(r&&(!state._ts||r._ts>state._ts)){state=r;window._localTs=state._ts||0;fullRender();}}).catch(()=>{});}
+  const raw=localStorage.getItem('vf1');
+  if(raw){
+    try{
+      const parsed=JSON.parse(raw);
+      // Sanity check: ignore if months list is absurdly large (corrupted state)
+      if(parsed && Array.isArray(parsed.months) && parsed.months.length<=48){
+        state=parsed;
+      }
+    }catch(e){}
+  }
+  document.getElementById('pt').innerHTML='<span class="vit">Vit</span><span class="fin">Finance</span>';
+  document.getElementById('ps').innerText=state.pageSub||'Meu controle financeiro pessoal';
+  renderMNav();renderMC(state.activeMonth);renderFeed();
+  if(window._fbLoad){
+    window._fbLoad().then(r=>{
+      if(r && Array.isArray(r.months) && r.months.length<=48){
+        if(!state._ts||r._ts>state._ts){
+          state=r;window._localTs=state._ts||0;fullRender();
+        }
+      } else if(r && Array.isArray(r.months) && r.months.length>48){
+        // Firebase has corrupted data — overwrite it with clean local state
+        window._fbSave(state);
+        toast('Dados da nuvem estavam corrompidos — limpos automaticamente','info');
+      }
+    }).catch(()=>{});
+  }
 }
 init();
 </script>
