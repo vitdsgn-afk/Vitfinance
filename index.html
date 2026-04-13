@@ -425,7 +425,7 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2
 function pv(t){return parseFloat(String(t||'').replace(/\./g,'').replace(',','.').replace(/[^\d.-]/g,''))||0;}
 function fmt(v){return 'R$ '+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function sel(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
-function mi(l){const[n,a]=l.split(' ');return parseInt(a)*100+MNS.indexOf(n);}
+function mi(l){const[n,a]=l.split(' ');return parseInt(a)*12+MNS.indexOf(n);}
 function addM(l,n){const[nm,an]=l.split(' ');let m=MNS.indexOf(nm),y=parseInt(an);m+=n;while(m>=12){m-=12;y++;}while(m<0){m+=12;y--;}return MNS[m]+' '+y;}
 function m2l(v){if(!v)return S.activeMonth;const[y,m]=v.split('-');return MNS[parseInt(m)-1]+' '+y;}
 function l2m(l){const[n,a]=l.split(' ');return a+'-'+String(MNS.indexOf(n)+1).padStart(2,'0');}
@@ -895,11 +895,11 @@ if(!S.installments || !S.installments.length) {
   S.installments = [
     // DIA 08
     {id:uid(),desc:'Plano - Claro',vp:60.00,tp:120,cartao:'d08',tit:'Andrea',mc:'Marco 2025',ini:'mesmo'},
-    {id:uid(),desc:'Sofa',vp:141.66,tp:10,cartao:'d08',tit:'Tassiana',mc:'Junho 2025',ini:'mesmo'},
+    {id:uid(),desc:'Sofa',vp:141.66,tp:10,cartao:'d08',tit:'Tassiana',mc:'Setembro 2025',ini:'mesmo'},
     {id:uid(),desc:'Emprestimo - Dividas',vp:189.85,tp:4,cartao:'d08',tit:'Andrea',mc:'Fevereiro 2026',ini:'mesmo'},
-    {id:uid(),desc:'Suplemento',vp:69.61,tp:3,cartao:'d08',tit:'Andrea',mc:'Janeiro 2025',ini:'mesmo'},
-    {id:uid(),desc:'Monitor Portatil',vp:135.15,tp:3,cartao:'d08',tit:'Andrea',mc:'Janeiro 2025',ini:'mesmo'},
-    {id:uid(),desc:'Dock Station',vp:101.26,tp:3,cartao:'d08',tit:'Andrea',mc:'Janeiro 2025',ini:'mesmo'},
+    {id:uid(),desc:'Suplemento',vp:69.61,tp:3,cartao:'d08',tit:'Andrea',mc:'Fevereiro 2026',ini:'mesmo'},
+    {id:uid(),desc:'Monitor Portatil',vp:135.15,tp:3,cartao:'d08',tit:'Andrea',mc:'Fevereiro 2026',ini:'mesmo'},
+    {id:uid(),desc:'Dock Station',vp:101.26,tp:3,cartao:'d08',tit:'Andrea',mc:'Fevereiro 2026',ini:'mesmo'},
     {id:uid(),desc:'Freepick',vp:199.36,tp:120,cartao:'d08',tit:'Andrea',mc:'Marco 2026',ini:'mesmo'},
     {id:uid(),desc:'Instrutor',vp:89.90,tp:120,cartao:'d08',tit:'Andrea',mc:'Fevereiro 2026',ini:'mesmo'},
     // DIA 15
@@ -907,14 +907,14 @@ if(!S.installments || !S.installments.length) {
     {id:uid(),desc:'Apple',vp:19.90,tp:120,cartao:'d15',tit:'Andrea',mc:'Abril 2026',ini:'mesmo'},
     {id:uid(),desc:'Emprestimo - Cartao',vp:157.36,tp:10,cartao:'d15',tit:'Andrea',mc:'Outubro 2025',ini:'mesmo'},
     // DIA 23
-    {id:uid(),desc:'Emprestimo - Cartao',vp:399.00,tp:10,cartao:'d23',tit:'Andrea',mc:'Setembro 2025',ini:'mesmo'},
+    {id:uid(),desc:'Emprestimo - Cartao',vp:399.00,tp:10,cartao:'d23',tit:'Andrea',mc:'Novembro 2025',ini:'mesmo'},
     {id:uid(),desc:'Investimento - Curso',vp:49.75,tp:10,cartao:'d23',tit:'Andrea',mc:'Abril 2026',ini:'mesmo'},
-    {id:uid(),desc:'Emprestimo - Cartao',vp:283.04,tp:7,cartao:'d23',tit:'Andrea',mc:'Outubro 2025',ini:'mesmo'},
+    {id:uid(),desc:'Emprestimo - Cartao',vp:283.04,tp:7,cartao:'d23',tit:'Andrea',mc:'Dezembro 2025',ini:'mesmo'},
     {id:uid(),desc:'Emprestimo - Cartao',vp:238.00,tp:10,cartao:'d23',tit:'Andrea',mc:'Novembro 2025',ini:'mesmo'},
     {id:uid(),desc:'Movel - Cozinha',vp:229.90,tp:10,cartao:'d23',tit:'Andrea',mc:'Marco 2026',ini:'proximo'},
-    {id:uid(),desc:'Presente Andrea',vp:140.18,tp:2,cartao:'d23',tit:'Andrea',mc:'Fevereiro 2026',ini:'mesmo'},
+    {id:uid(),desc:'Presente Andrea',vp:140.18,tp:2,cartao:'d23',tit:'Andrea',mc:'Marco 2026',ini:'mesmo'},
     {id:uid(),desc:'Emprestimo - Cartao',vp:105.96,tp:10,cartao:'d23',tit:'Andrea',mc:'Marco 2026',ini:'proximo'},
-    {id:uid(),desc:'Feira',vp:160.78,tp:3,cartao:'d23',tit:'Andrea',mc:'Janeiro 2025',ini:'mesmo'},
+    {id:uid(),desc:'Feira',vp:160.78,tp:3,cartao:'d23',tit:'Andrea',mc:'Marco 2026',ini:'mesmo'},
     {id:uid(),desc:'Uber - Previsao',vp:600.00,tp:120,cartao:'d23',tit:'Andrea',mc:'Abril 2026',ini:'mesmo'},
     // DIA 25
     {id:uid(),desc:'Emprestimo - Cartao',vp:242.10,tp:10,cartao:'d25',tit:'Andrea',mc:'Fevereiro 2026',ini:'mesmo'},
@@ -930,7 +930,7 @@ if(!S.installments || !S.installments.length) {
     {id:uid(),desc:'Autoescola - Piloto',vp:123.33,tp:3,cartao:'d25',tit:'Andrea',mc:'Marco 2026',ini:'proximo'},
     {id:uid(),desc:'Claude - Anthropic',vp:110.00,tp:120,cartao:'d25',tit:'Andrea',mc:'Abril 2026',ini:'mesmo'},
     {id:uid(),desc:'Taxa Detran',vp:96.67,tp:3,cartao:'d25',tit:'Andrea',mc:'Marco 2026',ini:'proximo'},
-    {id:uid(),desc:'Mouse - Setup',vp:86.00,tp:5,cartao:'d25',tit:'Andrea',mc:'Janeiro 2025',ini:'mesmo'}
+    {id:uid(),desc:'Mouse - Setup',vp:86.00,tp:5,cartao:'d25',tit:'Andrea',mc:'Marco 2026',ini:'mesmo'}
   ];
   localStorage.setItem(KEY, JSON.stringify(S));
 }
