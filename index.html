@@ -527,6 +527,7 @@ function confirmNM(){
   if(!S.months.includes(v)){S.months.push(v);S.months.sort((a,b)=>mi(b)-mi(a));}
   document.getElementById('nmi').style.display='none';
   document.getElementById('nmc').style.display='none';
+  replicarParaTodosMeses();
   swM(v);
 }
 
@@ -563,7 +564,7 @@ function buildMC(m){
 <div class="ac-bd"><div id="movlist"></div></div></div>
 
 <div class="acc" id="a5030"><div class="ac-h" onclick="tAcc('a5030')"><span class="ac-ar">&#9654;</span><span class="ac-ti">Regra 50 30 20</span></div>
-<div class="ac-bd"><div class="ca ca-b">50% necessidades | 30% desejos | 20% poupar/investir</div>
+<div class="ac-bd"><div class="ca ca-b">Calculado sobre o <b>Saldo Livre</b> | 50% necessidades | 30% desejos | 20% poupar/investir</div>
 <div class="ig">
 <div class="ic"><div class="ic-p" style="color:var(--r)">50%</div><div class="ic-l">Necessidades</div><div class="ic-d">Moradia, saude, transporte</div><div class="ic-v cr" id="i50">R$ 0,00</div></div>
 <div class="ic"><div class="ic-p" style="color:var(--w)">30%</div><div class="ic-l">Desejos</div><div class="ic-d">Lazer, roupas, viagens</div><div class="ic-v cw2" id="i30">R$ 0,00</div></div>
@@ -627,7 +628,7 @@ function calcAll(){
   const d1=df+c08+c15,d2=c23+c25;
   sel('ptot',fmt(td));sel('p0115',fmt(d1));sel('p1530',fmt(d2));
   if(td>0){const pb1=document.getElementById('pb01'),pb2=document.getElementById('pb15');if(pb1)pb1.style.width=Math.round(d1/td*100)+'%';if(pb2)pb2.style.width=Math.round(d2/td*100)+'%';}
-  sel('i50',fmt(rec*.5));sel('i30',fmt(rec*.3));sel('i20',fmt(rec*.2));
+  sel('i50',fmt(sal*.5));sel('i30',fmt(sal*.3));sel('i20',fmt(sal*.2));
   const bm=document.getElementById('bmov');if(bm)bm.textContent=(mvl>=0?'+':'')+fmt(mvl);
   const fo=document.getElementById('fout'),fi2=document.getElementById('fin2');
   if(fo)fo.textContent='-'+fmt(fdo);if(fi2)fi2.textContent='+'+fmt(fdi);
@@ -932,7 +933,28 @@ if(!S.installments || !S.installments.length) {
     {id:uid(),desc:'Taxa Detran',vp:96.67,tp:3,cartao:'d25',tit:'Andrea',mc:'Marco 2026',ini:'proximo'},
     {id:uid(),desc:'Mouse - Setup',vp:86.00,tp:5,cartao:'d25',tit:'Andrea',mc:'Marco 2026',ini:'mesmo'}
   ];
+
+  // Replica salarios e dividas fixas de Abril 2026 para todos os outros meses
+  replicarParaTodosMeses();
   localStorage.setItem(KEY, JSON.stringify(S));
+}
+
+// Replica salarios e dividas fixas do mes ativo para todos os outros meses que nao tiverem dados
+function replicarParaTodosMeses() {
+  const base = 'Abril 2026';
+  const salsBase = S.salarios[base] || [];
+  const divsBase = S.dividasFixas[base] || [];
+  S.months.forEach(m => {
+    if (m === base) return;
+    // Salarios: replica se o mes estiver vazio
+    if (!S.salarios[m] || !S.salarios[m].length) {
+      S.salarios[m] = salsBase.map(s => ({...s, id: uid()}));
+    }
+    // Dividas fixas: replica se o mes estiver vazio
+    if (!S.dividasFixas[m] || !S.dividasFixas[m].length) {
+      S.dividasFixas[m] = divsBase.map(d => ({...d, id: uid(), status: 'pendente'}));
+    }
+  });
 }
 
 renderMNav();
