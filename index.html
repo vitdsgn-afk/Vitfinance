@@ -1010,8 +1010,9 @@ function savMeta(){
 }
 function mtTipo(){const t=document.getElementById('mtt').value;const r=document.getElementById('mtarow');if(r)r.style.opacity=t==='investimento'?'0.4':'1';}
 
-// RESET
+// ── RESET / INIT ──
 const APP_VERSION = 4;
+
 function freshState(){
   return {
     _v: APP_VERSION,
@@ -1022,34 +1023,31 @@ function freshState(){
     salarios:{},dividasFixas:{},installments:[],statusMap:{},movimentos:{},aportes:[],metas:[]
   };
 }
-function resetAll(){
-  if(!confirm('Apagar todos os dados e começar do zero?'))return;
-  state=freshState();
-  localStorage.removeItem('vf1');
-  // Also clear feed
-  localStorage.removeItem(feedK());
-  if(window._fbSave)window._fbSave(state);
-  fullRender();
-  toast('Dados zerados com sucesso');
-}
-
-// INIT
-const APP_VERSION = 4; // v4: hard reset — ignores any previous saved data
 
 function isValidState(s){
-  return s && Array.isArray(s.months) && s.months.length >= 1 && s.months.length <= 24 && s._v === APP_VERSION;
+  return s && s._v === APP_VERSION && Array.isArray(s.months) && s.months.length >= 1 && s.months.length <= 24;
+}
+
+function resetAll(){
+  if(!confirm('Apagar todos os dados e começar do zero?'))return;
+  state = freshState();
+  localStorage.removeItem('vf1');
+  localStorage.removeItem(feedK());
+  if(window._fbSave) window._fbSave(state);
+  fullRender();
+  toast('Dados zerados');
 }
 
 function init(){
-  // Always start with fresh state
+  // Start clean
   state = freshState();
 
-  // Only load localStorage if it's from this version
+  // Load localStorage only if valid version
   try{
     const raw = localStorage.getItem('vf1');
     if(raw){
-      const parsed = JSON.parse(raw);
-      if(isValidState(parsed)) state = parsed;
+      const p = JSON.parse(raw);
+      if(isValidState(p)) state = p;
       else localStorage.removeItem('vf1');
     }
   }catch(e){ localStorage.removeItem('vf1'); }
@@ -1058,15 +1056,15 @@ function init(){
   document.getElementById('ps').innerText = state.pageSub || 'Meu controle financeiro pessoal';
   renderMNav(); renderMC(state.activeMonth); renderFeed();
 
+  // Firebase: delete old data, use only v4
   if(window._fbLoad){
     window._fbLoad().then(r=>{
       if(isValidState(r)){
-        // Valid v4 remote state — use it if newer than local
         if(!state._ts || r._ts > state._ts){
           state = r; window._localTs = r._ts || 0; fullRender();
         }
       } else {
-        // Firebase has old data — FORCE overwrite with clean state NOW
+        // Old/corrupt Firebase — overwrite with current clean state
         const clean = freshState();
         clean._ts = Date.now();
         window._localTs = clean._ts;
