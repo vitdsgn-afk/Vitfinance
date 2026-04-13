@@ -7,39 +7,12 @@
 <meta name="theme-color" content="#1b4332">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231b4332'/><text x='50' y='62' font-size='48' font-family='sans-serif' font-weight='700' fill='white' text-anchor='middle'>V</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@300;400;500&family=Sora:wght@400;700&display=swap" rel="stylesheet">
-<script type="module">
- import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
- import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
- const cfg = {apiKey:"AIzaSyALtCQ0FKCqbiWrRXZUWd2C-sATCNNk1zg",authDomain:"vitfinance-1d30d.firebaseapp.com",projectId:"vitfinance-1d30d",storageBucket:"vitfinance-1d30d.firebasestorage.app",messagingSenderId:"81249244978",appId:"1:81249244978:web:358cbe1dc0f4841ab6692b"};
- const db = getFirestore(initializeApp(cfg));
- const DOC = doc(db,'vitfinance','dados');
- window._fbSave   = async d => { try { await setDoc(DOC,{payload:JSON.stringify(d)}); return true; } catch(e){ return false; }};
- window._fbDelete = async () => { try { await deleteDoc(DOC); return true; } catch(e){ return false; }};
- window._fbLoad   = async () => {
-   try {
-     const s = await getDoc(DOC);
-     if(!s.exists()) return null;
-     const data = JSON.parse(s.data().payload);
-     // If data has no _v:4 flag, delete it immediately from Firebase
-     if(!data || data._v !== 4){
-       await deleteDoc(DOC);
-       return null;
-     }
-     return data;
-   } catch(e){ return null; }
- };
- onSnapshot(DOC, snap => {
-   if(snap.exists() && window._fbReady){
-     try {
-       const r = JSON.parse(snap.data().payload);
-       if(r._v === 4 && r._ts && r._ts !== window._localTs){
-         state=r; window._localTs=r._ts; fullRender();
-       }
-     } catch(e){}
-   }
- });
- window._fbReady=false;
- document.addEventListener('DOMContentLoaded',()=>{ window._fbReady=true; });
+<script>
+ // Sem Firebase — localStorage apenas. Sem conflitos de sincronização.
+ window._fbSave  = async () => true;
+ window._fbInit  = async () => {};
+ window._fbReady = false;
+ document.addEventListener('DOMContentLoaded', () => { window._fbReady = true; });
 </script>
 <style>
 :root{
@@ -534,7 +507,7 @@ function saveAll(){
  readDOM();
  state._v = APP_VERSION;
  state._ts=Date.now();window._localTs=state._ts;
- localStorage.setItem('vf1',JSON.stringify(state));
+ localStorage.setItem('vf2',JSON.stringify(state));
  if(window._fbSave){window._fbSave(state).then(ok=>{const e=document.getElementById('svmsg');e.textContent=ok?'salvo na nuvem':'salvo local';e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2500);});}
  else{const e=document.getElementById('svmsg');e.textContent='salvo';e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2000);}
 }
@@ -1011,7 +984,7 @@ function savMeta(){
 function mtTipo(){const t=document.getElementById('mtt').value;const r=document.getElementById('mtarow');if(r)r.style.opacity=t==='investimento'?'0.4':'1';}
 
 // ── RESET / INIT ──
-const APP_VERSION = 4;
+const APP_VERSION = 5;
 
 function freshState(){
   return {
@@ -1034,7 +1007,7 @@ function isValidState(s){
 function resetAll(){
   if(!confirm('Apagar todos os dados e começar do zero?'))return;
   state = freshState();
-  localStorage.removeItem('vf1');
+  localStorage.removeItem('vf2');
   localStorage.removeItem(feedK());
   if(window._fbSave) window._fbSave(state);
   fullRender();
@@ -1042,42 +1015,26 @@ function resetAll(){
 }
 
 function init(){
-  // Start clean
-  state = freshState();
-
-  // Load localStorage only if valid version
+  // Limpa localStorage se versão antiga
   try{
-    const raw = localStorage.getItem('vf1');
+    const raw = localStorage.getItem('vf2');
     if(raw){
       const p = JSON.parse(raw);
       if(isValidState(p)) state = p;
-      else localStorage.removeItem('vf1');
+      else localStorage.removeItem('vf2');
     }
-  }catch(e){ localStorage.removeItem('vf1'); }
+  }catch(e){ localStorage.removeItem('vf2'); }
 
   document.getElementById('pt').innerHTML='<span class="vit">Vit</span><span class="fin">Finance</span>';
   document.getElementById('ps').innerText = state.pageSub || 'Meu controle financeiro pessoal';
   renderMNav(); renderMC(state.activeMonth); renderFeed();
 
-  // Firebase: delete old data, use only v4
-  if(window._fbLoad){
-    window._fbLoad().then(r=>{
-      if(isValidState(r)){
-        if(!state._ts || r._ts > state._ts){
-          state = r; window._localTs = r._ts || 0; fullRender();
-        }
-      } else {
-        // Old/corrupt Firebase — overwrite with current clean state
-        const clean = freshState();
-        clean._ts = Date.now();
-        window._localTs = clean._ts;
-        state = clean;
-        localStorage.setItem('vf1', JSON.stringify(state));
-        window._fbSave(state);
-        fullRender();
-      }
-    }).catch(()=>{});
-  }
+  // Força delete do Firebase e salva estado correto com _v:5
+  state._v = APP_VERSION;
+  state._ts = Date.now();
+  window._localTs = state._ts;
+  localStorage.setItem('vf2', JSON.stringify(state));
+  if(window._fbInit) window._fbInit(state);
 }
 init();
 </script>
