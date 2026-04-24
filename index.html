@@ -292,6 +292,8 @@ input[type=month]:focus{border-color:var(--g);background:#fff;}
     <div class="sb-sec">Planejamento</div>
     <div class="sb-it" onclick="goVw('metas',this)">Objetivos e Metas</div>
     <div class="sb-it" onclick="goVw('invest',this)">Investimentos</div>
+    <div class="sb-sec">Studio</div>
+    <div class="sb-it" onclick="goVw('vitdsgn',this)">VITDSGN</div>
   </nav>
 </aside>
 <button class="sb-btn" onclick="toggleSb()">&#8801;</button>
@@ -368,6 +370,11 @@ input[type=month]:focus{border-color:var(--g);background:#fff;}
         <button class="btn bp" style="font-size:.72rem;padding:5px 10px;margin-left:auto" onclick="openIM()">+ Registrar aporte</button>
       </h2>
       <div id="invcnt"></div>
+    </div>
+
+    <!-- VITDSGN -->
+    <div class="vw" id="vw-vitdsgn">
+      <div id="vitdsgn-cnt"></div>
     </div>
 
   </div>
@@ -450,12 +457,47 @@ input[type=month]:focus{border-color:var(--g);background:#fff;}
 <!-- MODAL META -->
 <div class="mo" id="mMet"><div class="md">
   <h3>Nova Meta</h3>
-  <div class="fr"><label class="fl">Nome</label><input class="fi3" id="mtn" placeholder="Ex: Viagem, Reserva..."></div>
+  <div class="fr"><label class="fl">Nome da meta</label><input class="fi3" id="mtn" placeholder="Ex: Viagem Europa, CNH, Promocao..."></div>
   <div class="fr2">
-    <div class="fr" style="margin:0"><label class="fl">Valor alvo (R$)</label><input class="fi3" id="mta" type="number" step="0.01" placeholder="0,00"></div>
-    <div class="fr" style="margin:0"><label class="fl">Valor atual (R$)</label><input class="fi3" id="mtc" type="number" step="0.01" placeholder="0,00"></div>
+    <div class="fr" style="margin:0">
+      <label class="fl">Categoria</label>
+      <select class="fi3" id="mtcat" onchange="toggleMetaCat()">
+        <option value="financeira">Financeira</option>
+        <option value="pessoal">Pessoal</option>
+        <option value="profissional">Profissional</option>
+      </select>
+    </div>
+    <div class="fr" style="margin:0">
+      <label class="fl">Tipo de acompanhamento</label>
+      <select class="fi3" id="mttipo" onchange="toggleMetaTipo()">
+        <option value="dinheiro">Dinheiro (R$)</option>
+        <option value="percentual">Percentual (%)</option>
+        <option value="habito">Habito (dias/vezes)</option>
+        <option value="livre">Livre (descritivo)</option>
+      </select>
+    </div>
+  </div>
+  <!-- Campos financeiros -->
+  <div id="mt-fin-fields" style="margin-top:10px">
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Valor alvo (R$)</label><input class="fi3" id="mta" type="number" step="0.01" placeholder="0,00"></div>
+      <div class="fr" style="margin:0"><label class="fl">Valor atual (R$)</label><input class="fi3" id="mtc" type="number" step="0.01" placeholder="0,00"></div>
+    </div>
+  </div>
+  <!-- Campos percentual/habito -->
+  <div id="mt-pct-fields" style="display:none;margin-top:10px">
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Meta (100 = completo)</label><input class="fi3" id="mta2" type="number" placeholder="100"></div>
+      <div class="fr" style="margin:0"><label class="fl">Progresso atual</label><input class="fi3" id="mtc2" type="number" placeholder="0"></div>
+    </div>
+  </div>
+  <!-- Campos livre -->
+  <div id="mt-livre-fields" style="display:none;margin-top:10px">
+    <div class="fr"><label class="fl">Descricao do objetivo</label><input class="fi3" id="mtdesc" placeholder="Ex: Ler 12 livros, Aprender ingles..."></div>
+    <div class="fr"><label class="fl">Como vou medir?</label><input class="fi3" id="mtmedida" placeholder="Ex: Livros lidos, horas de estudo..."></div>
   </div>
   <div class="fr" style="margin-top:10px"><label class="fl">Prazo</label><input class="fi3" id="mtp" type="month"></div>
+  <div class="fr"><label class="fl">Notas / motivacao (opcional)</label><input class="fi3" id="mtnota" placeholder="Por que essa meta e importante para voce?"></div>
   <div class="ma"><button class="btn bo" onclick="cm('mMet')">Cancelar</button><button class="btn bp" onclick="savMeta()">Salvar</button></div>
 </div></div>
 
@@ -475,7 +517,8 @@ function toast(msg,e=false){const t=document.getElementById('toast');t.textConte
 // ── STATE ──
 let S={
   months:['Abril 2026'],activeMonth:'Abril 2026',
-  salarios:{},dividasFixas:{},installments:[],statusMap:{},movimentos:{},aportes:[],metas:[]
+  salarios:{},dividasFixas:{},installments:[],statusMap:{},movimentos:{},aportes:[],metas:[],
+  vitdsgn:{projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0}
 };
 const KEY='vitf_1';
 function gS(m){if(!S.salarios[m])S.salarios[m]=[];return S.salarios[m];}
@@ -511,7 +554,8 @@ function loadSt(){
 function doReset(){
   if(!confirm('Apagar todos os dados?'))return;
   localStorage.removeItem(KEY);
-  S={months:['Abril 2026'],activeMonth:'Abril 2026',salarios:{},dividasFixas:{},installments:[],statusMap:{},movimentos:{},aportes:[],metas:[]};
+  S={months:['Abril 2026'],activeMonth:'Abril 2026',salarios:{},dividasFixas:{},installments:[],statusMap:{},movimentos:{},aportes:[],metas:[],
+  vitdsgn:{projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0}};
   fullRender();toast('Dados apagados');
 }
 function readDOM(){
@@ -549,6 +593,7 @@ function goVw(n,el){
   if(n==='anual')renderAnual();
   if(n==='metas')renderMetas();
   if(n==='invest')renderInvest();
+  if(n==='vitdsgn')renderVitdsgn();
 }
 function fullRender(){
   renderMNav();renderMC(S.activeMonth);renderFeed();
@@ -828,36 +873,63 @@ ${ms.map(m=>{
 // ── METAS ──
 function renderMetas(){
   const e=document.getElementById('metc');if(!e)return;
-  const mts=S.metas||[];const tiv=(S.aportes||[]).reduce((s,a)=>s+a.v,0);
-  if(!mts.length){e.innerHTML=`<div style="text-align:center;padding:40px 20px;background:var(--sur);border:1px solid var(--bor);border-radius:10px"><div style="font-size:.9rem;font-weight:700;margin-bottom:5px">Nenhuma meta ainda</div><div style="font-size:.82rem;color:var(--mu);margin-bottom:16px">Defina seus objetivos e acompanhe o progresso.</div><button class="btn bp" onclick="openMM()">+ Criar meta</button></div>`;return;}
-  e.innerHTML=mts.map(m=>{
-    const at=m.tipo==='investimento'?tiv:(m.atual||0);
-    const pct=Math.min(100,Math.round(at/m.alvo*100));
-    const fl=Math.max(0,m.alvo-at);
-    const win=at>=m.alvo;
-    return`<div class="mc3${win?' win':''}">
-<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px">
-<div><div class="mn3">${m.nome}</div><span class="tag ${m.tipo==='investimento'?'tp':m.tipo==='divida'?'tr':'tg'}" style="font-size:.6rem">${m.tipo}</span></div>
-<div style="text-align:right"><div style="font-family:var(--mo);font-size:1.2rem;font-weight:500;color:var(--g)">${pct}%</div><button class="db" onclick="S.metas=S.metas.filter(x=>x.id!=='${m.id}');renderMetas()" style="font-size:.7rem;color:var(--mu)">excluir</button></div>
-</div>
-<div class="mtr"><div class="mf" style="width:${pct}%"></div></div>
-<div class="mft"><span>${fmt(at)} guardados</span><span>Meta: ${fmt(m.alvo)}</span></div>
-${fl>0?`<div style="font-family:var(--mo);font-size:.68rem;color:var(--mu);margin-top:5px">Falta ${fmt(fl)}${m.prazo?' | prazo: '+m.prazo.split('-').reverse().slice(0,2).join('/'):''}${m.tipo==='investimento'?' | atualiza com aportes':''}</div>`:'<div style="font-family:var(--mo);font-size:.68rem;color:var(--g);margin-top:5px">Meta atingida!</div>'}
-${m.tipo!=='investimento'&&!win?`<div style="margin-top:8px;display:flex;gap:6px"><input id="av-${m.id}" type="number" step="0.01" placeholder="Adicionar valor..." class="fi3" style="max-width:140px;padding:5px 8px;font-size:.75rem"><button class="btn bp" style="padding:5px 10px;font-size:.72rem" onclick="const i=document.getElementById('av-${m.id}');const v=parseFloat(i.value)||0;if(v){const mt=S.metas.find(x=>x.id==='${m.id}');if(mt){mt.atual=(mt.atual||0)+v;i.value='';renderMetas();}}">+ Adicionar</button></div>`:''}
-</div>`;
+  const mts=S.metas||[];
+  const tiv=(S.aportes||[]).reduce((s,a)=>s+a.v,0);
+  if(!mts.length){
+    e.innerHTML='<div style="text-align:center;padding:40px 20px;background:var(--sur);border:1px solid var(--bor);border-radius:10px"><div style="font-size:.9rem;font-weight:700;margin-bottom:5px">Nenhuma meta ainda</div><div style="font-size:.82rem;color:var(--mu);margin-bottom:16px">Adicione metas pessoais, financeiras e profissionais.</div><button class="btn bp" onclick="openMM()">+ Criar meta</button></div>';
+    return;
+  }
+  const CATS=[
+    {key:'financeira',  label:'Financeiras',   cor:'#a020c8'},
+    {key:'pessoal',     label:'Pessoais',       cor:'#1a5276'},
+    {key:'profissional',label:'Profissionais',  cor:'#1d6a3a'},
+  ];
+  e.innerHTML=CATS.map(cat=>{
+    const its=mts.filter(m=>m.cat===cat.key||(!m.cat&&cat.key==='financeira'));
+    const empty=`<div style="margin-bottom:20px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:4px;height:18px;background:${cat.cor};border-radius:2px"></div><h3 style="font-size:.87rem;font-weight:700;color:${cat.cor}">${cat.label}</h3><span style="font-family:var(--mo);font-size:.62rem;color:var(--mu)">nenhuma</span><button class="ab" style="margin-left:auto;font-size:.7rem" onclick="document.getElementById('mtcat').value='${cat.key}';openMM()">+ Adicionar</button></div></div>`;
+    if(!its.length)return empty;
+    return `<div style="margin-bottom:24px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:4px;height:18px;background:${cat.cor};border-radius:2px"></div><h3 style="font-size:.87rem;font-weight:700;color:${cat.cor}">${cat.label}</h3><span style="font-family:var(--mo);font-size:.6rem;padding:2px 8px;border-radius:20px;background:${cat.cor}18;color:${cat.cor}">${its.length} meta${its.length>1?'s':''}</span><button class="ab" style="margin-left:auto;font-size:.7rem" onclick="document.getElementById('mtcat').value='${cat.key}';openMM()">+ Adicionar</button></div><div style="display:flex;flex-direction:column;gap:8px">${its.map(m=>metaCard(m,tiv,cat)).join('')}</div></div>`;
   }).join('');
+}
+
+function metaCard(m,tiv,cat){
+  const isDin=m.tipo==='dinheiro'||!m.tipo;
+  const isPct=m.tipo==='percentual'||m.tipo==='habito';
+  const isLivre=m.tipo==='livre';
+  const atual=isDin?(m.atual||0):(m.atual||0);
+  const alvo=m.alvo||100;
+  const pct=alvo>0?Math.min(100,Math.round(atual/alvo*100)):0;
+  const win=pct>=100;
+  const fl=Math.max(0,alvo-atual);
+  const cor=cat.cor;
+  const progressBar=`<div style="height:7px;background:var(--bor);border-radius:99px;overflow:hidden;margin-bottom:7px"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${cor},${cor}88);border-radius:99px;transition:width .5s"></div></div>`;
+  const prazoStr=m.prazo?' | prazo: '+m.prazo.split('-').reverse().slice(0,2).join('/'):'';
+  let body='';
+  if(isLivre){
+    body=`<div style="font-size:.82rem;color:var(--mu);margin-bottom:5px">${m.desc||''}</div>${m.medida?`<div style="font-family:var(--mo);font-size:.68rem;color:var(--mu)">Medida: ${m.medida}</div>`:''}${m.prazo?`<div style="font-family:var(--mo);font-size:.68rem;color:var(--mu);margin-top:3px">Prazo: ${m.prazo.split('-').reverse().slice(0,2).join('/')}</div>`:''}<div style="margin-top:8px"><select class="fi3" style="width:auto;padding:4px 8px;font-size:.76rem" onchange="const mt=S.metas.find(x=>x.id==='${m.id}');if(mt){mt.status=this.value;saveAll();}"><option value="em_andamento" ${(m.status||'em_andamento')==='em_andamento'?'selected':''}>Em andamento</option><option value="pausada" ${m.status==='pausada'?'selected':''}>Pausada</option><option value="concluida" ${m.status==='concluida'?'selected':''}>Concluida</option></select></div>`;
+  } else {
+    const label=isDin?`<span>${fmt(atual)} guardados</span><span>Meta: ${fmt(alvo)}</span>`:`<span>Progresso: ${atual}</span><span>Meta: ${alvo}</span>`;
+    const addBtn=isDin&&!win?`<div style="margin-top:8px;display:flex;gap:6px"><input id="av-${m.id}" type="number" step="0.01" placeholder="Adicionar..." class="fi3" style="max-width:130px;padding:5px 8px;font-size:.75rem"><button class="btn bp" style="padding:5px 10px;font-size:.72rem" onclick="const i=document.getElementById('av-${m.id}');const v=parseFloat(i.value)||0;if(v){const mt=S.metas.find(x=>x.id==='${m.id}');if(mt){mt.atual=(mt.atual||0)+v;i.value='';renderMetas();}}">+</button></div>`:'';
+    const updBtn=isPct&&!win?`<div style="margin-top:8px;display:flex;gap:6px"><input id="av-${m.id}" type="number" step="1" placeholder="Novo valor..." class="fi3" style="max-width:130px;padding:5px 8px;font-size:.75rem"><button class="btn bp" style="padding:5px 10px;font-size:.72rem" onclick="const i=document.getElementById('av-${m.id}');const v=parseFloat(i.value);if(!isNaN(v)){const mt=S.metas.find(x=>x.id==='${m.id}');if(mt){mt.atual=v;i.value='';renderMetas();}}">OK</button></div>`:'';
+    body=progressBar+`<div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:.7rem;color:var(--mu)">${label}</div>${fl>0?`<div style="font-family:var(--mo);font-size:.67rem;color:var(--mu);margin-top:3px">Falta${isDin?' '+fmt(fl):' '+fl}${prazoStr}</div>`:''}`+addBtn+updBtn;
+  }
+  return `<div style="background:var(--sur);border:1px solid ${win?cor:'var(--bor)'};border-radius:10px;padding:14px;${win?'background:'+cor+'08;':''}"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px"><div style="flex:1"><div style="font-weight:700;font-size:.88rem;margin-bottom:3px">${m.nome}</div>${m.nota?`<div style="font-size:.75rem;color:var(--mu);font-style:italic;margin-bottom:4px">"${m.nota}"</div>`:''}<div style="display:flex;gap:5px;flex-wrap:wrap">${m.tipo?`<span style="font-family:var(--mo);font-size:.59rem;background:#f0ede7;color:var(--mu);padding:2px 6px;border-radius:20px">${m.tipo}</span>`:''}${win?`<span style="font-family:var(--mo);font-size:.59rem;background:${cor};color:#fff;padding:2px 6px;border-radius:20px">Concluida!</span>`:''}</div></div><div style="text-align:right;margin-left:10px"><div style="font-family:var(--mo);font-size:1.05rem;font-weight:600;color:${cor}">${isLivre&&m.status==='concluida'?'Feito':pct+'%'}</div><button class="db" onclick="S.metas=S.metas.filter(x=>x.id!=='${m.id}');renderMetas()" style="font-size:.7rem;color:var(--mu)">excluir</button></div></div>${body}</div>`;
 }
 
 // ── INVESTIMENTOS PAGE ──
 const CDI_AA = 0.1065;
 const RATES = {
-  'Poupanca':    0.063,
-  '100% CDI':    CDI_AA,
-  '105% CDI':    CDI_AA * 1.05,
-  '110% CDI':    CDI_AA * 1.10,
-  'Tesouro IPCA':0.112,
-  'Acoes (est.)':0.13,
+  'Nubank Garantido (100% CDI)': CDI_AA,
+  'Caixinha Turbo (115% CDI)':   CDI_AA * 1.15,
+  'Poupanca':                    0.063,
+  '105% CDI':                    CDI_AA * 1.05,
+  '110% CDI':                    CDI_AA * 1.10,
+  'Tesouro IPCA':                0.112,
+  'Acoes (est.)':                0.13,
 };
+// Seus fundos
+const MEU_FUNDO_1 = { nome: 'Nubank Garantido', taxa: CDI_AA,        cor: '#a020c8' };
+const MEU_FUNDO_2 = { nome: 'Caixinha Turbo',   taxa: CDI_AA * 1.15, cor: '#6b2d9a' };
 
 function projCompound(principal, rateAA, months) {
   const rm = Math.pow(1 + rateAA, 1/12) - 1;
@@ -900,45 +972,6 @@ function renderInvest() {
   const saldoLivre = salAtivo - totalDiv;
   const pctCompr = salAtivo > 0 ? Math.round(totalDiv/salAtivo*100) : 0;
   const faltaMeta = Math.max(0, meta20 - total);
-
-  const tips = [
-    {
-      icon:'1',
-      title:'Aporte mensal automatico',
-      desc:`Separe os ${fmt(meta20)} (20% do salario) logo que receber. Trate como uma conta fixa.`,
-      save:`Potencial em 1 ano: ${fmt(projCompound(meta20*12, CDI_AA*1.05, 12) - meta20*12)} de rendimento`
-    },
-    {
-      icon:'2',
-      title:'Cancele assinaturas nao usadas',
-      desc:'Revise suas assinaturas mensais. Cada R$ 50 cancelado investido por 5 anos vira mais de R$ 90.',
-      save:`Exemplo: R$ 50/mes por 5 anos = ${fmt(projCompound(50*60,CDI_AA*1.05,0) + 50*60*(Math.pow(1+CDI_AA/12,60)-1)/(CDI_AA/12))}`
-    },
-    {
-      icon:'3',
-      title:'Regra dos 24 horas',
-      desc:'Antes de compras nao planejadas acima de R$ 100, espere 24h. Elimina ~30% dos impulsos.',
-      save:`${pctCompr}% da sua renda esta comprometida — cada compra por impulso reduz seu saldo livre de ${fmt(saldoLivre)}`
-    },
-    {
-      icon:'4',
-      title:'Negocie dividas que encerram em breve',
-      desc:'Parcelas terminando nos proximos 2 meses liberam dinheiro. Use esse valor para aportes.',
-      save:'Veja na Visao Geral quais dividas encerram em breve e quanto elas liberam'
-    },
-    {
-      icon:'5',
-      title:'Fundo de emergencia primeiro',
-      desc:'Antes de investir para crescimento, construa 3 a 6 meses de despesas fixas em liquidez diaria (CDB 100% CDI ou Tesouro Selic).',
-      save:`Sua meta de emergencia: ${fmt(totalDiv * 3)} a ${fmt(totalDiv * 6)}`
-    },
-    {
-      icon:'6',
-      title:'Juros compostos: comece agora',
-      desc:'Comecar com R$ 200/mes hoje por 10 anos supera comecar com R$ 400/mes em 5 anos.',
-      save:`${fmt(200)} /mes por 10 anos a 105% CDI = ${fmt((() => { const rm=Math.pow(1+CDI_AA*1.05,1/12)-1; return 200*(Math.pow(1+rm,120)-1)/rm; })())}`
-    },
-  ];
 
   e.innerHTML = `
 <!-- HERO CARDS -->
@@ -994,6 +1027,64 @@ function renderInvest() {
 <div class="inv-section">
   <h3>Projecao por tipo de investimento</h3>
   <div style="font-family:var(--mo);font-size:.65rem;color:var(--mu);margin-bottom:12px">Base: ${fmt(total)} investidos hoje, sem novos aportes</div>
+
+  <!-- SEUS FUNDOS EM DESTAQUE -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
+    ${[MEU_FUNDO_1, MEU_FUNDO_2].map(f => {
+      const rm = Math.pow(1+f.taxa, 1/12)-1;
+      const ps = [{l:'3m',m:3},{l:'6m',m:6},{l:'1a',m:12},{l:'2a',m:24},{l:'5a',m:60}];
+      return `<div style="background:var(--sur);border:2px solid ${f.cor}22;border-radius:10px;padding:16px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:${f.cor};border-radius:10px 0 0 10px"></div>
+        <div style="padding-left:8px">
+          <div style="font-family:var(--mo);font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:${f.cor};margin-bottom:4px;font-weight:600">${f.nome}</div>
+          <div style="font-family:var(--mo);font-size:1rem;font-weight:700;color:var(--tx);margin-bottom:2px">${(f.taxa*100).toFixed(2)}% a.a.</div>
+          <div style="font-family:var(--mo);font-size:.65rem;color:var(--mu);margin-bottom:12px">${f===MEU_FUNDO_1?'100% CDI':'115% CDI'} · rendimento mensal: ${(rm*100).toFixed(3)}%</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${ps.map(p => {
+              const v = total>0 ? projCompound(total,f.taxa,p.m) : 0;
+              const g = v - total;
+              return `<div style="flex:1;min-width:48px;background:${f.cor}11;border-radius:6px;padding:6px 8px;text-align:center">
+                <div style="font-family:var(--mo);font-size:.58rem;color:var(--mu)">${p.l}</div>
+                <div style="font-family:var(--mo);font-size:.78rem;font-weight:600;color:${f.cor}">${total>0?fmt(v):'—'}</div>
+                ${total>0?`<div style="font-family:var(--mo);font-size:.58rem;color:var(--mu)">+${fmt(g)}</div>`:''}
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+
+  <!-- COMPARATIVO ENTRE OS DOIS FUNDOS -->
+  ${total > 0 ? `<div style="background:#f9f6ff;border:1px solid #d8b4f8;border-radius:8px;padding:14px;margin-bottom:18px">
+    <div style="font-family:var(--mo);font-size:.62rem;text-transform:uppercase;letter-spacing:.07em;color:var(--p);margin-bottom:10px;font-weight:600">Comparativo: Nubank vs Caixinha Turbo</div>
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.8rem">
+      <thead><tr>
+        <th style="font-family:var(--mo);font-size:.58rem;color:var(--mu);padding:5px 10px;text-align:left;border-bottom:1px solid #e8d8f8">Periodo</th>
+        <th style="font-family:var(--mo);font-size:.58rem;color:${MEU_FUNDO_1.cor};padding:5px 10px;text-align:right;border-bottom:1px solid #e8d8f8">Nubank (100%)</th>
+        <th style="font-family:var(--mo);font-size:.58rem;color:${MEU_FUNDO_2.cor};padding:5px 10px;text-align:right;border-bottom:1px solid #e8d8f8">Caixinha (115%)</th>
+        <th style="font-family:var(--mo);font-size:.58rem;color:var(--mu);padding:5px 10px;text-align:right;border-bottom:1px solid #e8d8f8">Diferenca</th>
+      </tr></thead>
+      <tbody>
+        ${[{l:'6 meses',m:6},{l:'1 ano',m:12},{l:'2 anos',m:24},{l:'5 anos',m:60},{l:'10 anos',m:120}].map(p=>{
+          const v1=projCompound(total,MEU_FUNDO_1.taxa,p.m);
+          const v2=projCompound(total,MEU_FUNDO_2.taxa,p.m);
+          const diff=v2-v1;
+          return `<tr>
+            <td style="padding:7px 10px;font-family:var(--mo);font-size:.78rem;border-bottom:1px solid #f0e8f8">${p.l}</td>
+            <td style="padding:7px 10px;font-family:var(--mo);font-size:.78rem;text-align:right;border-bottom:1px solid #f0e8f8;color:${MEU_FUNDO_1.cor}">${fmt(v1)}</td>
+            <td style="padding:7px 10px;font-family:var(--mo);font-size:.78rem;text-align:right;border-bottom:1px solid #f0e8f8;color:${MEU_FUNDO_2.cor};font-weight:600">${fmt(v2)}</td>
+            <td style="padding:7px 10px;font-family:var(--mo);font-size:.78rem;text-align:right;border-bottom:1px solid #f0e8f8;color:var(--g)">+${fmt(diff)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    </div>
+    <div style="font-family:var(--mo);font-size:.63rem;color:var(--mu);margin-top:8px">A Caixinha Turbo rende ${((CDI_AA*1.15 - CDI_AA)/CDI_AA*100).toFixed(1)}% a mais que o Nubank Garantido ao longo do tempo.</div>
+  </div>` : ''}
+
+  <div style="font-family:var(--mo);font-size:.65rem;color:var(--mu);margin-bottom:12px">Comparativo com outras modalidades</div>
   <div style="overflow-x:auto">
   <table class="proj-table">
     <thead><tr>
@@ -1037,22 +1128,287 @@ function renderInvest() {
   </div>
   <div id="sim-result"></div>
 </div>
-
-<!-- DICAS DE ECONOMIA -->
-<div class="inv-section">
-  <h3>Dicas personalizadas para voce</h3>
-  ${tips.map(t=>`
-  <div class="tip-card">
-    <div class="tip-icon">${t.icon}</div>
-    <div class="tip-body">
-      <div class="tip-title">${t.title}</div>
-      <div class="tip-desc">${t.desc}</div>
-      <div class="tip-save">${t.save}</div>
-    </div>
-  </div>`).join('')}
-</div>`;
+`;
 
   renderSimulador();
+}
+
+// ── VITDSGN ──
+function vd(){ if(!S.vitdsgn) S.vitdsgn={projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0}; return S.vitdsgn; }
+
+function renderVitdsgn(){
+  const e=document.getElementById('vitdsgn-cnt'); if(!e) return;
+  const d=vd();
+  const proj=d.projetos||[];
+  const tar=d.tarefas||[];
+  const ideias=d.ideias||[];
+  const clientes=d.clientes||[];
+
+  // Métricas rápidas
+  const totalReceber=proj.filter(p=>p.status!=='pago').reduce((s,p)=>s+(p.valor||0),0);
+  const totalRecebido=proj.filter(p=>p.status==='pago').reduce((s,p)=>s+(p.valor||0),0);
+  const emExec=proj.filter(p=>p.status==='execucao').length;
+  const tarPend=tar.filter(t=>!t.feita).length;
+
+  e.innerHTML=`
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+  <div>
+    <div style="font-family:'Sora',sans-serif;font-size:1.4rem;font-weight:700;color:#2a1535;letter-spacing:-.02em">VITDSGN</div>
+    <div style="font-size:.82rem;color:var(--mu);font-style:italic">Gestao do seu trabalho autonomo</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn bp" style="font-size:.72rem;padding:5px 10px" onclick="vdOpenProjeto()">+ Projeto</button>
+    <button class="btn" style="font-size:.72rem;padding:5px 10px;background:#f0d6f8;color:#a020c8;border:none" onclick="vdOpenTarefa()">+ Tarefa</button>
+    <button class="btn" style="font-size:.72rem;padding:5px 10px;background:#faf9f6;color:var(--tx);border:1px solid var(--bor2)" onclick="vdOpenIdeia()">+ Ideia</button>
+  </div>
+</div>
+
+<!-- MÉTRICAS -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+  <div class="inv-card" style="text-align:center">
+    <div class="inv-lbl">Em execucao</div>
+    <div class="inv-val" style="color:#a020c8">${emExec}</div>
+    <div class="inv-sub">projeto${emExec!==1?'s':''}</div>
+  </div>
+  <div class="inv-card" style="text-align:center">
+    <div class="inv-lbl">A receber</div>
+    <div class="inv-val" style="color:var(--w)">${fmt(totalReceber)}</div>
+    <div class="inv-sub">em aberto</div>
+  </div>
+  <div class="inv-card" style="text-align:center">
+    <div class="inv-lbl">Recebido</div>
+    <div class="inv-val" style="color:var(--g)">${fmt(totalRecebido)}</div>
+    <div class="inv-sub">concluidos</div>
+  </div>
+  <div class="inv-card" style="text-align:center">
+    <div class="inv-lbl">Tarefas pendentes</div>
+    <div class="inv-val" style="color:var(--r)">${tarPend}</div>
+    <div class="inv-sub">tarefa${tarPend!==1?'s':''}</div>
+  </div>
+</div>
+
+<!-- META DE RECEITA MENSAL -->
+<div class="inv-section" style="margin-bottom:14px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <h3 style="margin:0;border:none;padding:0">Meta de receita mensal</h3>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input id="vd-meta" type="number" class="fi3" style="width:130px;padding:5px 9px;font-size:.8rem" placeholder="Ex: 5000" value="${d.receita_meta||''}" oninput="vd().receita_meta=parseFloat(this.value)||0;renderVitdsgn()">
+    </div>
+  </div>
+  ${d.receita_meta>0?`
+  <div style="height:8px;background:var(--bor);border-radius:99px;overflow:hidden;margin-bottom:6px">
+    <div style="height:100%;width:${Math.min(100,Math.round(totalRecebido/d.receita_meta*100))}%;background:linear-gradient(90deg,#a020c8,#da6ef5);border-radius:99px;transition:width .5s"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:.7rem;color:var(--mu)">
+    <span>Recebido: ${fmt(totalRecebido)}</span>
+    <span>${Math.min(100,Math.round(totalRecebido/d.receita_meta*100))}% da meta de ${fmt(d.receita_meta)}</span>
+  </div>`:'<div style="font-size:.81rem;color:var(--mu);font-style:italic">Defina sua meta de receita mensal acima.</div>'}
+</div>
+
+<!-- PROJETOS / TRABALHOS EM EXECUÇÃO -->
+<div class="inv-section" style="margin-bottom:14px">
+  <h3>Trabalhos em execucao</h3>
+  ${proj.length===0?'<div style="font-size:.82rem;color:var(--mu);font-style:italic">Nenhum projeto cadastrado. Use o botao + Projeto acima.</div>':''}
+  ${proj.length>0?`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.83rem">
+    <thead><tr>
+      <th style="font-family:var(--mo);font-size:.58rem;color:var(--mu);padding:6px 10px;text-align:left;border-bottom:1px solid var(--bor)">Servico / Projeto</th>
+      <th style="font-family:var(--mo);font-size:.58rem;color:var(--mu);padding:6px 10px;text-align:left;border-bottom:1px solid var(--bor)">Cliente</th>
+      <th style="font-family:var(--mo);font-size:.58rem;color:var(--mu);padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Valor</th>
+      <th style="font-family:var(--mo);font-size:.58rem;color:var(--mu);padding:6px 10px;text-align:left;border-bottom:1px solid var(--bor)">Prazo</th>
+      <th style="font-family:var(--mo);font-size:.58rem;color:var(--mu);padding:6px 10px;text-align:left;border-bottom:1px solid var(--bor)">Status</th>
+      <th style="width:28px;border-bottom:1px solid var(--bor)"></th>
+    </tr></thead>
+    <tbody>
+      ${proj.map(p=>{
+        const stCor=p.status==='pago'?'var(--g)':p.status==='execucao'?'#a020c8':p.status==='aguardando'?'var(--w)':'var(--mu)';
+        const stBg=p.status==='pago'?'var(--gl)':p.status==='execucao'?'#f0d6f8':p.status==='aguardando'?'var(--wl)':'#f0ede7';
+        const stLabel=p.status==='pago'?'Pago':p.status==='execucao'?'Em execucao':p.status==='aguardando'?'Aguardando':'Proposta';
+        return `<tr style="transition:background .1s" onmouseover="this.style.background='#faf9f6'" onmouseout="this.style.background=''">
+          <td style="padding:9px 10px;border-bottom:1px solid var(--bor);font-weight:600">${p.servico}</td>
+          <td style="padding:9px 10px;border-bottom:1px solid var(--bor);color:var(--mu);font-size:.8rem">${p.cliente||'—'}</td>
+          <td style="padding:9px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);font-weight:500;color:${p.status==='pago'?'var(--g)':'var(--tx)'}">
+            ${p.valor>0?fmt(p.valor):'—'}
+          </td>
+          <td style="padding:9px 10px;border-bottom:1px solid var(--bor);font-family:var(--mo);font-size:.75rem;color:var(--mu)">${p.prazo||'—'}</td>
+          <td style="padding:9px 10px;border-bottom:1px solid var(--bor)">
+            <select style="background:${stBg};color:${stCor};border:none;font-family:var(--mo);font-size:.67rem;padding:3px 7px;border-radius:20px;cursor:pointer;font-weight:600" onchange="const p=vd().projetos.find(x=>x.id==='${p.id}');if(p){p.status=this.value;saveAll();renderVitdsgn();}">
+              <option value="proposta" ${p.status==='proposta'?'selected':''}>Proposta</option>
+              <option value="execucao" ${p.status==='execucao'?'selected':''}>Em execucao</option>
+              <option value="aguardando" ${p.status==='aguardando'?'selected':''}>Aguardando</option>
+              <option value="pago" ${p.status==='pago'?'selected':''}>Pago</option>
+            </select>
+          </td>
+          <td style="padding:9px 10px;border-bottom:1px solid var(--bor)"><button class="db" onclick="vd().projetos=vd().projetos.filter(x=>x.id!=='${p.id}');renderVitdsgn()">x</button></td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table></div>`:''}
+</div>
+
+<!-- REESTRUTURACAO DE MERCADO - TAREFAS -->
+<div class="inv-section" style="margin-bottom:14px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <h3 style="margin:0;border:none;padding:0">Reestruturacao de mercado</h3>
+    <span style="font-family:var(--mo);font-size:.67rem;color:var(--mu)">${tar.filter(t=>t.feita).length}/${tar.length} concluidas</span>
+  </div>
+  ${tar.length>0?`
+  <div style="height:5px;background:var(--bor);border-radius:99px;overflow:hidden;margin-bottom:14px">
+    <div style="height:100%;width:${tar.length>0?Math.round(tar.filter(t=>t.feita).length/tar.length*100):0}%;background:linear-gradient(90deg,#a020c8,#da6ef5);border-radius:99px;transition:width .4s"></div>
+  </div>`:''}
+  ${tar.length===0?'<div style="font-size:.82rem;color:var(--mu);font-style:italic;margin-bottom:8px">Nenhuma tarefa ainda. Adicione as acoes que precisa tomar para se reposicionar no mercado.</div>':''}
+  <div style="display:flex;flex-direction:column;gap:6px">
+    ${tar.map(t=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:${t.feita?'#faf9f6':'var(--sur)'};border:1px solid ${t.feita?'var(--bor)':'var(--bor)'};border-radius:8px;transition:all .15s">
+      <input type="checkbox" ${t.feita?'checked':''} style="accent-color:#a020c8;width:15px;height:15px;cursor:pointer;flex-shrink:0" onchange="const tr=vd().tarefas.find(x=>x.id==='${t.id}');if(tr){tr.feita=this.checked;saveAll();renderVitdsgn();}">
+      <div style="flex:1">
+        <div style="font-size:.84rem;font-weight:${t.feita?'400':'600'};${t.feita?'text-decoration:line-through;color:var(--mu)':''}">${t.texto}</div>
+        ${t.cat?`<div style="font-family:var(--mo);font-size:.62rem;color:var(--mu);margin-top:2px">${t.cat}</div>`:''}
+      </div>
+      ${t.prioridade==='alta'?`<span style="font-family:var(--mo);font-size:.6rem;background:var(--rl);color:var(--r);padding:2px 6px;border-radius:20px">urgente</span>`:''}
+      <button class="db" onclick="vd().tarefas=vd().tarefas.filter(x=>x.id!=='${t.id}');renderVitdsgn()">x</button>
+    </div>`).join('')}
+  </div>
+</div>
+
+<!-- BANCO DE IDEIAS -->
+<div class="inv-section" style="margin-bottom:14px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <h3 style="margin:0;border:none;padding:0">Banco de ideias</h3>
+    <span style="font-family:var(--mo);font-size:.67rem;color:var(--mu)">${ideias.length} ideia${ideias.length!==1?'s':''}</span>
+  </div>
+  ${ideias.length===0?'<div style="font-size:.82rem;color:var(--mu);font-style:italic">Capture suas ideias aqui — novos servicos, estrategias, parcerias, conteudo...</div>':''}
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">
+    ${ideias.map(i=>`
+    <div style="background:${i.tipo==='servico'?'#f9f0ff':i.tipo==='estrategia'?'#fef9e7':i.tipo==='parceria'?'#eaf4fd':'#faf9f6'};border:1px solid var(--bor);border-radius:9px;padding:13px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <span style="font-family:var(--mo);font-size:.6rem;color:${i.tipo==='servico'?'#a020c8':i.tipo==='estrategia'?'var(--w)':i.tipo==='parceria'?'var(--b)':'var(--mu)'};text-transform:uppercase;letter-spacing:.05em">${i.tipo||'ideia'}</span>
+        <button class="db" style="font-size:.75rem" onclick="vd().ideias=vd().ideias.filter(x=>x.id!=='${i.id}');renderVitdsgn()">x</button>
+      </div>
+      <div style="font-size:.84rem;font-weight:600;margin-bottom:4px">${i.titulo}</div>
+      ${i.desc?`<div style="font-size:.78rem;color:var(--mu);line-height:1.4">${i.desc}</div>`:''}
+    </div>`).join('')}
+  </div>
+</div>`;
+
+  // Re-bind meta input after render
+  const metaInp = document.getElementById('vd-meta');
+  if(metaInp) metaInp.value = d.receita_meta||'';
+}
+
+// VITDSGN MODALS
+function vdOpenProjeto(){
+  // Simple inline prompt-style modal
+  const html=`<div class="md">
+    <h3>Novo projeto</h3>
+    <div class="fr"><label class="fl">Servico / descricao</label><input class="fi3" id="vd-p-serv" placeholder="Ex: Identidade Visual, Site, Social Media..."></div>
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Cliente</label><input class="fi3" id="vd-p-cli" placeholder="Nome do cliente"></div>
+      <div class="fr" style="margin:0"><label class="fl">Valor (R$)</label><input class="fi3" id="vd-p-val" type="number" step="0.01" placeholder="0,00"></div>
+    </div>
+    <div class="fr2" style="margin-top:10px">
+      <div class="fr" style="margin:0"><label class="fl">Prazo</label><input class="fi3" id="vd-p-prazo" type="date"></div>
+      <div class="fr" style="margin:0"><label class="fl">Status</label>
+        <select class="fi3" id="vd-p-st">
+          <option value="proposta">Proposta</option>
+          <option value="execucao" selected>Em execucao</option>
+          <option value="aguardando">Aguardando</option>
+          <option value="pago">Pago</option>
+        </select>
+      </div>
+    </div>
+    <div class="ma"><button class="btn bo" onclick="cm('vd-modal')">Cancelar</button><button class="btn bp" onclick="vdSaveProjeto()">Salvar</button></div>
+  </div>`;
+  showVdModal(html);
+}
+
+function vdOpenTarefa(){
+  const html=`<div class="md">
+    <h3>Nova tarefa de reestruturacao</h3>
+    <div class="fr"><label class="fl">Tarefa</label><input class="fi3" id="vd-t-txt" placeholder="Ex: Atualizar portfolio, Definir nicho, Criar proposta padrao..."></div>
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Categoria</label>
+        <select class="fi3" id="vd-t-cat">
+          <option value="">Geral</option>
+          <option value="Portfolio">Portfolio</option>
+          <option value="Posicionamento">Posicionamento</option>
+          <option value="Clientes">Clientes</option>
+          <option value="Precificacao">Precificacao</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Processo">Processo</option>
+          <option value="Financeiro">Financeiro</option>
+        </select>
+      </div>
+      <div class="fr" style="margin:0"><label class="fl">Prioridade</label>
+        <select class="fi3" id="vd-t-pri">
+          <option value="normal">Normal</option>
+          <option value="alta">Urgente</option>
+        </select>
+      </div>
+    </div>
+    <div class="ma"><button class="btn bo" onclick="cm('vd-modal')">Cancelar</button><button class="btn bp" onclick="vdSaveTarefa()">Salvar</button></div>
+  </div>`;
+  showVdModal(html);
+}
+
+function vdOpenIdeia(){
+  const html=`<div class="md">
+    <h3>Nova ideia</h3>
+    <div class="fr"><label class="fl">Titulo da ideia</label><input class="fi3" id="vd-i-tit" placeholder="Ex: Criar pack de logos, Parceria com agencia..."></div>
+    <div class="fr"><label class="fl">Descricao (opcional)</label><input class="fi3" id="vd-i-desc" placeholder="Desenvolva a ideia..."></div>
+    <div class="fr"><label class="fl">Tipo</label>
+      <select class="fi3" id="vd-i-tipo">
+        <option value="servico">Novo servico</option>
+        <option value="estrategia">Estrategia</option>
+        <option value="parceria">Parceria</option>
+        <option value="conteudo">Conteudo</option>
+        <option value="outro">Outro</option>
+      </select>
+    </div>
+    <div class="ma"><button class="btn bo" onclick="cm('vd-modal')">Cancelar</button><button class="btn bp" onclick="vdSaveIdeia()">Salvar</button></div>
+  </div>`;
+  showVdModal(html);
+}
+
+function showVdModal(html){
+  let overlay=document.getElementById('vd-modal');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='vd-modal';
+    overlay.className='mo';
+    overlay.onclick=e=>{if(e.target===overlay)overlay.classList.remove('open');};
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML=html;
+  overlay.classList.add('open');
+  overlay.querySelector('input')?.focus();
+}
+
+function vdSaveProjeto(){
+  const serv=document.getElementById('vd-p-serv')?.value.trim();
+  if(!serv){toast('Preencha o servico',true);return;}
+  const p={
+    id:uid(),servico:serv,
+    cliente:document.getElementById('vd-p-cli')?.value.trim()||'',
+    valor:parseFloat(document.getElementById('vd-p-val')?.value)||0,
+    prazo:document.getElementById('vd-p-prazo')?.value||'',
+    status:document.getElementById('vd-p-st')?.value||'execucao'
+  };
+  vd().projetos.push(p);
+  cm('vd-modal');saveAll();renderVitdsgn();toast('Projeto adicionado');
+}
+
+function vdSaveTarefa(){
+  const txt=document.getElementById('vd-t-txt')?.value.trim();
+  if(!txt){toast('Preencha a tarefa',true);return;}
+  vd().tarefas.push({id:uid(),texto:txt,cat:document.getElementById('vd-t-cat')?.value||'',prioridade:document.getElementById('vd-t-pri')?.value||'normal',feita:false});
+  cm('vd-modal');saveAll();renderVitdsgn();toast('Tarefa adicionada');
+}
+
+function vdSaveIdeia(){
+  const tit=document.getElementById('vd-i-tit')?.value.trim();
+  if(!tit){toast('Preencha o titulo',true);return;}
+  vd().ideias.push({id:uid(),titulo:tit,desc:document.getElementById('vd-i-desc')?.value.trim()||'',tipo:document.getElementById('vd-i-tipo')?.value||'outro'});
+  cm('vd-modal');saveAll();renderVitdsgn();toast('Ideia salva');
 }
 
 function renderSimulador() {
@@ -1105,6 +1461,13 @@ function openSM(){om('mSal');setTimeout(()=>document.getElementById('msd')?.focu
 function openDM(){om('mDiv');setTimeout(()=>document.getElementById('mdd')?.focus(),80);}
 function openIM(){document.getElementById('midia').value=new Date().getDate();om('mInv');setTimeout(()=>document.getElementById('mid')?.focus(),80);}
 function openMM(){om('mMet');setTimeout(()=>document.getElementById('mtn')?.focus(),80);}
+function toggleMetaCat(){}
+function toggleMetaTipo(){
+  const t=document.getElementById('mttipo')?.value;if(!t)return;
+  document.getElementById('mt-fin-fields').style.display  =t==='dinheiro'?'block':'none';
+  document.getElementById('mt-pct-fields').style.display  =(t==='percentual'||t==='habito')?'block':'none';
+  document.getElementById('mt-livre-fields').style.display=t==='livre'?'block':'none';
+}
 let _ck='d08';
 function openCM(k){_ck=k||'d08';document.getElementById('mcct').value=_ck;document.getElementById('mcmes').value=l2m(S.activeMonth);document.getElementById('mcin').value='mesmo';document.getElementById('mcti').value='';om('mCart');setTimeout(()=>document.getElementById('mcd')?.focus(),80);}
 
@@ -1148,14 +1511,31 @@ function savInv(){
   renderInv();toast('Aporte registrado');
 }
 function savMeta(){
-  const n=document.getElementById('mtn').value.trim(),a=parseFloat(document.getElementById('mta').value)||0;
-  const c=parseFloat(document.getElementById('mtc').value)||0,p=document.getElementById('mtp').value;
-  if(!n||!a){toast('Preencha nome e valor alvo',true);return;}
+  const n=document.getElementById('mtn').value.trim();
+  const cat=document.getElementById('mtcat').value;
+  const tipo=document.getElementById('mttipo').value;
+  const p=document.getElementById('mtp').value;
+  const nota=document.getElementById('mtnota')?.value.trim()||'';
+  if(!n){toast('Preencha o nome da meta',true);return;}
+  let alvo=100,atual=0,desc='',medida='';
+  if(tipo==='dinheiro'){
+    alvo=parseFloat(document.getElementById('mta').value)||0;
+    atual=parseFloat(document.getElementById('mtc').value)||0;
+    if(!alvo){toast('Preencha o valor alvo',true);return;}
+  } else if(tipo==='percentual'||tipo==='habito'){
+    alvo=parseFloat(document.getElementById('mta2').value)||100;
+    atual=parseFloat(document.getElementById('mtc2').value)||0;
+  } else {
+    desc=document.getElementById('mtdesc')?.value.trim()||'';
+    medida=document.getElementById('mtmedida')?.value.trim()||'';
+  }
   if(!S.metas)S.metas=[];
-  S.metas.push({id:uid(),nome:n,tipo:'economia',alvo:a,atual:c,prazo:p});
-  cm('mMet');['mtn','mta','mtc','mtp'].forEach(id=>document.getElementById(id).value='');
+  S.metas.push({id:uid(),nome:n,cat,tipo,alvo,atual,desc,medida,prazo:p,nota});
+  cm('mMet');
+  ['mtn','mta','mtc','mta2','mtc2','mtdesc','mtmedida','mtnota','mtp'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   renderMetas();toast('Meta criada');
 }
+
 
 // ── INIT ──
 loadSt();
@@ -1163,7 +1543,8 @@ loadSt();
 // Atualiza mes ativo para Maio 2026 se nao houver dados salvos
 if(!S.aportes || !S.aportes.length) {
   S.aportes = [
-    {id:uid(),d:'Investimento - Nubank',v:801.51,dia:'22',m:'Maio 2026'}
+    {id:uid(),d:'Limite Garantido - Nubank',v:1030.00,dia:'22',m:'Maio 2026'},
+    {id:uid(),d:'Caixinha Turbo',v:45.00,dia:'22',m:'Maio 2026'}
   ];
 }
 if(!S.activeMonth || S.activeMonth === 'Abril 2026') {
