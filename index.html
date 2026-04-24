@@ -1670,6 +1670,35 @@ if(!S.installments || !S.installments.length) {
     {id:uid(),desc:'TV - Cacheado',vp:250.00,tp:5,cartao:'d25',tit:'Andrea',mc:'Abril 2026',ini:'mesmo'}
   ];
 
+  // Metas importadas do Notion - pagina METAS (2026)
+  if(!S.metas || !S.metas.length) {
+    S.metas = [
+      // FINANCEIRAS
+      {id:uid(),nome:'Conquistar renda mensal liquida - 10k',cat:'financeira',tipo:'dinheiro',alvo:10000,atual:6300,desc:'',medida:'',prazo:'2026-12',nota:''},
+      {id:uid(),nome:'Investir - 11k liquido',cat:'financeira',tipo:'dinheiro',alvo:11000,atual:1075,desc:'',medida:'',prazo:'2026-12',nota:'Nubank + Caixinha Turbo'},
+      {id:uid(),nome:'Comprar um carro',cat:'financeira',tipo:'livre',alvo:0,atual:0,desc:'Adquirir veiculo proprio',medida:'Veiculo adquirido',prazo:'',nota:''},
+      {id:uid(),nome:'Aprender mais sobre investimentos',cat:'financeira',tipo:'livre',alvo:0,atual:0,desc:'Aprofundar conhecimentos em renda fixa, CDB, Tesouro',medida:'Cursos e aplicacoes praticas',prazo:'',nota:''},
+      // PESSOAIS
+      {id:uid(),nome:'Conquistar habilitacao AB',cat:'pessoal',tipo:'livre',alvo:0,atual:0,desc:'Obter CNH categorias A e B',medida:'CNH em maos',prazo:'2026-12',nota:''},
+      {id:uid(),nome:'Ter 3 hobbies',cat:'pessoal',tipo:'percentual',alvo:3,atual:0,desc:'',medida:'Hobbies ativos e praticados regularmente',prazo:'2026-12',nota:''},
+      {id:uid(),nome:'Concluir 5 livros em 2026',cat:'pessoal',tipo:'percentual',alvo:5,atual:0,desc:'',medida:'Livros lidos',prazo:'2026-12',nota:''},
+      {id:uid(),nome:'Atingir 60kg',cat:'pessoal',tipo:'livre',alvo:0,atual:0,desc:'Meta de saude e bem-estar',medida:'Balanca / acompanhamento',prazo:'2026-12',nota:''},
+      {id:uid(),nome:'Ter acompanhamento Nutricional e Personal',cat:'pessoal',tipo:'livre',alvo:0,atual:0,desc:'Contratar nutricionista e personal trainer',medida:'Acompanhamentos ativos',prazo:'',nota:''},
+      {id:uid(),nome:'5 meses seguidos na academia',cat:'pessoal',tipo:'percentual',alvo:5,atual:0,desc:'',medida:'Meses consecutivos frequentando a academia',prazo:'2026-12',nota:''},
+      {id:uid(),nome:'Cuidar mais da saude',cat:'pessoal',tipo:'livre',alvo:0,atual:0,desc:'Adotar habitos saudaveis no dia a dia',medida:'Consultas, exames, rotina saudavel',prazo:'',nota:''},
+      {id:uid(),nome:'Se alimentar melhor',cat:'pessoal',tipo:'livre',alvo:0,atual:0,desc:'Melhorar qualidade da alimentacao',medida:'Refeicoes saudaveis por semana',prazo:'',nota:''},
+      {id:uid(),nome:'Fazer 5 viagens',cat:'pessoal',tipo:'percentual',alvo:5,atual:0,desc:'',medida:'Viagens realizadas',prazo:'2026-12',nota:''},
+      {id:uid(),nome:'Realizar um sonho da minha mae',cat:'pessoal',tipo:'livre',alvo:0,atual:0,desc:'Presentear minha mae com algo que ela sempre quis',medida:'Realizado',prazo:'',nota:''},
+      {id:uid(),nome:'Construir meu escritorio dos sonhos',cat:'pessoal',tipo:'livre',alvo:0,atual:0,desc:'Montar um home office / estudio ideal para trabalho',medida:'Espaco montado e funcionando',prazo:'',nota:''},
+      // PROFISSIONAIS
+      {id:uid(),nome:'Crescimento - Singular/MPC/VITDSGN',cat:'profissional',tipo:'percentual',alvo:3,atual:0,desc:'MPC: IDV + design de marcas (2.5k) | Singular: gestao e frente internacional (3k) | VITDSGN: 2 clientes SM + 1k/mes',medida:'Frentes de crescimento ativas',prazo:'2026-12',nota:''},
+      {id:uid(),nome:'Conquistar faturamento mensal 5k - MEI',cat:'profissional',tipo:'dinheiro',alvo:5000,atual:0,desc:'',medida:'',prazo:'2026-12',nota:''},
+      {id:uid(),nome:'Finalizar 3 cursos de Design',cat:'profissional',tipo:'percentual',alvo:3,atual:0,desc:'',medida:'Cursos concluidos',prazo:'2026-12',nota:''},
+      {id:uid(),nome:'Ser destaque do Agencia Ativa',cat:'profissional',tipo:'livre',alvo:0,atual:0,desc:'Se destacar como profissional de referencia na Agencia Ativa',medida:'Reconhecimento e resultados',prazo:'',nota:''},
+      {id:uid(),nome:'Construir uma empresa virtual',cat:'profissional',tipo:'livre',alvo:0,atual:0,desc:'Estruturar e lancar negocio digital',medida:'Empresa ativa e gerando renda',prazo:'',nota:''},
+    ];
+  }
+
   // Replica salarios e dividas fixas de Abril 2026 para todos os outros meses
   replicarParaTodosMeses();
   localStorage.setItem(KEY, JSON.stringify(S));
