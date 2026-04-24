@@ -634,7 +634,7 @@ function buildMC(m){
 <button class="ab" onclick="openSM()">+ Adicionar salario</button></div></div>
 
 <div class="acc open" id="ad"><div class="ac-h" onclick="tAcc('ad')"><span class="ac-ar">&#9654;</span><span class="ac-ti">Dividas Fixas</span><span class="sbg sr" id="bdix">R$ 0,00</span></div>
-<div class="ac-bd"><div class="tw"><table class="nt" id="tdix"><thead><tr><th>Descricao</th><th>Valor (R$)</th><th>Dia</th><th>Categoria</th><th>Status</th><th style="width:28px"></th></tr></thead><tbody>${dfix.map(d=>{const co=['Moradia','Alimentacao','Saude','Educacao','Transporte','Assinatura','Financiamento','Outros'].map(c=>`<option${c===d.cat?' selected':''}>${c}</option>`).join('');const so=['pendente','pago','atrasado'].map(s=>`<option${s===d.status?' selected':''}>${s}</option>`).join('');const sc=d.status==='pago'?'tg':d.status==='atrasado'?'tr':'ty';return`<tr data-id="${d.id}"><td><div contenteditable>${d.desc||''}</div></td><td style="width:110px"><div contenteditable class="mn red" oninput="calcAll()">${d.valor||'0,00'}</div></td><td style="width:60px"><div contenteditable class="mn gray">${d.dia||''}</div></td><td style="width:130px"><select class="isl" onchange="calcAll()">${co}</select></td><td style="width:100px"><select class="isl tag ${sc}" onchange="uSt(this)">${so}</select></td><td><button class="db" onclick="this.closest('tr').remove();calcAll()">x</button></td></tr>`;}).join('')}</tbody></table></div>
+<div class="ac-bd"><div class="tw"><table class="nt" id="tdix"><thead><tr><th>Descricao</th><th>Valor (R$)</th><th>Dia</th><th>Categoria</th><th>Status</th><th style="width:28px"></th></tr></thead><tbody>${dfix.map(d=>{const co=['Moradia','Alimentacao','Saude','Educacao','Transporte','Assinatura','Financiamento','Outros'].map(c=>`<option${c===d.cat?' selected':''}>${c}</option>`).join('');const so=['pendente','pago','atrasado'].map(s=>`<option${s===d.status?' selected':''}>${s}</option>`).join('');const sc=d.status==='pago'?'tg':d.status==='atrasado'?'tr':'ty';return`<tr data-id="${d.id}" style="${d.status==='pago'?'background:#f0fff4;':d.status==='atrasado'?'background:#fff5f5;':''}"><td><div contenteditable>${d.desc||''}</div></td><td style="width:110px"><div contenteditable class="mn red" oninput="calcAll()">${d.valor||'0,00'}</div></td><td style="width:60px"><div contenteditable class="mn gray">${d.dia||''}</div></td><td style="width:130px"><select class="isl" onchange="calcAll()">${co}</select></td><td style="width:100px"><select class="isl tag ${sc}" onchange="uSt(this);const r=this.closest('tr');if(r)r.style.background=this.value==='pago'?'#f0fff4':this.value==='atrasado'?'#fff5f5':''">${so}</select></td><td><button class="db" onclick="this.closest('tr').remove();calcAll()">x</button></td></tr>`;}).join('')}</tbody></table></div>
 <button class="ab" onclick="openDM()">+ Adicionar divida fixa</button></div></div>
 
 <div class="acc open" id="ac"><div class="ac-h" onclick="tAcc('ac')"><span class="ac-ar">&#9654;</span><span class="ac-ti">Cartoes de Credito</span><span class="sbg sr" id="bcart">R$ 0,00</span></div>
@@ -672,14 +672,18 @@ function cBlk(m,k,lbl){
     const so=['pendente','pago','atrasado'].map(s=>`<option${s===st?' selected':''}>${s}</option>`).join('');
     const sc=st==='pago'?'tg':st==='atrasado'?'tr':'ty';
     const fin=it.pa===it.tp;
-    return`<tr data-id="${it.id}"><td>${it.desc}</td><td style="width:80px"><span class="tag tz" style="font-size:.59rem">${it.tit||'-'}</span></td><td style="width:70px"><span class="tag tz">${it.pa}/${it.tp<=120?it.tp:'cont.'}</span></td><td style="width:100px" class="mn red">${fmt(it.vp)}</td><td style="width:110px"><span class="tag ${fin?'tp':'tb'}" style="font-size:.59rem">${it.tp<=120?it.mf+( fin?' fin':''):'Continuo'}</span></td><td style="width:100px"><select class="isl tag ${sc} stsl" onchange="uSt(this);sSt('${m}','${it.id}',this.value)">${so}</select></td><td><button class="db" title="Remover de todos os meses" onclick="if(confirm('Remover de todos os meses?')){S.installments=S.installments.filter(i=>i.id!=='${it.id}');renderMC(S.activeMonth);}">x</button></td></tr>`;
+    return`<tr data-id="${it.id}" style="${st==='pago'?'background:#f0fff4;':st==='atrasado'?'background:#fff5f5;':''}"><td>${it.desc}</td><td style="width:80px"><span class="tag tz" style="font-size:.59rem">${it.tit||'-'}</span></td><td style="width:70px"><span class="tag tz">${it.pa}/${it.tp<=120?it.tp:'cont.'}</span></td><td style="width:100px" class="mn red">${fmt(it.vp)}</td><td style="width:110px"><span class="tag ${fin?'tp':'tb'}" style="font-size:.59rem">${it.tp<=120?it.mf+( fin?' fin':''):'Continuo'}</span></td><td style="width:100px"><select class="isl tag ${sc} stsl" onchange="uSt(this);sSt('${m}','${it.id}',this.value)">${so}</select></td><td><button class="db" title="Remover de todos os meses" onclick="if(confirm('Remover de todos os meses?')){S.installments=S.installments.filter(i=>i.id!=='${it.id}');renderMC(S.activeMonth);}">x</button></td></tr>`;
   }).join('');
   return`<h3 class="ss">${lbl} <span class="tag tr" id="b${k}" style="font-size:.59rem">R$ 0,00</span></h3>
 <div class="tw"><table class="nt" id="t${k}"><thead><tr><th>Descricao</th><th>Titular</th><th>Parcela</th><th>Valor</th><th>Finaliza</th><th>Status</th><th style="width:28px"></th></tr></thead><tbody>${rows}</tbody></table></div>
 <button class="ab" onclick="openCM('${k}')">+ Adicionar item</button>`;
 }
 
-function uSt(s){s.className='isl tag stsl '+(s.value==='pago'?'tg':s.value==='atrasado'?'tr':'ty');}
+function uSt(s){
+  s.className='isl tag stsl '+(s.value==='pago'?'tg':s.value==='atrasado'?'tr':'ty');
+  const row=s.closest('tr');
+  if(row){row.style.background=s.value==='pago'?'#f0fff4':s.value==='atrasado'?'#fff5f5':'';}
+}
 
 // ── CALC ──
 function scol(tid,ci){
@@ -896,24 +900,70 @@ function metaCard(m,tiv,cat){
   const isDin=m.tipo==='dinheiro'||!m.tipo;
   const isPct=m.tipo==='percentual'||m.tipo==='habito';
   const isLivre=m.tipo==='livre';
-  const atual=isDin?(m.atual||0):(m.atual||0);
+  const atual=m.atual||0;
   const alvo=m.alvo||100;
   const pct=alvo>0?Math.min(100,Math.round(atual/alvo*100)):0;
-  const win=pct>=100;
+  const win=(!isLivre&&pct>=100)||(isLivre&&m.status==='concluida');
   const fl=Math.max(0,alvo-atual);
   const cor=cat.cor;
   const progressBar=`<div style="height:7px;background:var(--bor);border-radius:99px;overflow:hidden;margin-bottom:7px"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${cor},${cor}88);border-radius:99px;transition:width .5s"></div></div>`;
   const prazoStr=m.prazo?' | prazo: '+m.prazo.split('-').reverse().slice(0,2).join('/'):'';
+
+  // Celebração emblematica para metas concluidas
+  if(win){
+    return `<div style="background:linear-gradient(135deg,${cor}18,${cor}08);border:2px solid ${cor};border-radius:12px;padding:18px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:${cor}15;border-radius:0 12px 0 80px"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div style="width:40px;height:40px;background:${cor};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">&#10003;</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:.92rem">${m.nome}</div>
+          <div style="font-family:var(--mo);font-size:.65rem;color:${cor};font-weight:600;margin-top:2px">META CONQUISTADA!</div>
+        </div>
+        <button class="db" onclick="S.metas=S.metas.filter(x=>x.id!=='${m.id}');renderMetas()" style="font-size:.7rem;color:var(--mu);z-index:1">excluir</button>
+      </div>
+      ${m.nota?`<div style="font-size:.78rem;color:var(--mu);font-style:italic;margin-bottom:8px;padding-left:52px">"${m.nota}"</div>`:''}
+      ${!isLivre?`<div style="padding-left:52px;font-family:var(--mo);font-size:.72rem;color:${cor};font-weight:500">${isDin?fmt(atual)+' investidos':atual+' concluidos'} · Meta: ${isDin?fmt(alvo):alvo}</div>`:''}
+      ${isLivre&&m.prazo?`<div style="padding-left:52px;font-family:var(--mo);font-size:.68rem;color:var(--mu)">Concluida${prazoStr}</div>`:''}
+    </div>`;
+  }
+
   let body='';
   if(isLivre){
-    body=`<div style="font-size:.82rem;color:var(--mu);margin-bottom:5px">${m.desc||''}</div>${m.medida?`<div style="font-family:var(--mo);font-size:.68rem;color:var(--mu)">Medida: ${m.medida}</div>`:''}${m.prazo?`<div style="font-family:var(--mo);font-size:.68rem;color:var(--mu);margin-top:3px">Prazo: ${m.prazo.split('-').reverse().slice(0,2).join('/')}</div>`:''}<div style="margin-top:8px"><select class="fi3" style="width:auto;padding:4px 8px;font-size:.76rem" onchange="const mt=S.metas.find(x=>x.id==='${m.id}');if(mt){mt.status=this.value;saveAll();}"><option value="em_andamento" ${(m.status||'em_andamento')==='em_andamento'?'selected':''}>Em andamento</option><option value="pausada" ${m.status==='pausada'?'selected':''}>Pausada</option><option value="concluida" ${m.status==='concluida'?'selected':''}>Concluida</option></select></div>`;
+    body=`<div style="font-size:.82rem;color:var(--mu);margin-bottom:5px">${m.desc||''}</div>
+    ${m.medida?`<div style="font-family:var(--mo);font-size:.68rem;color:var(--mu)">Como medir: ${m.medida}</div>`:''}
+    ${m.prazo?`<div style="font-family:var(--mo);font-size:.68rem;color:var(--mu);margin-top:3px">Prazo: ${m.prazo.split('-').reverse().slice(0,2).join('/')}</div>`:''}
+    <div style="margin-top:8px"><select class="fi3" style="width:auto;padding:4px 8px;font-size:.76rem" onchange="const mt=S.metas.find(x=>x.id==='${m.id}');if(mt){mt.status=this.value;renderMetas();saveAll();}">
+      <option value="em_andamento" ${(m.status||'em_andamento')==='em_andamento'?'selected':''}>Em andamento</option>
+      <option value="pausada" ${m.status==='pausada'?'selected':''}>Pausada</option>
+      <option value="concluida" ${m.status==='concluida'?'selected':''}>Concluida</option>
+    </select></div>`;
   } else {
     const label=isDin?`<span>${fmt(atual)} guardados</span><span>Meta: ${fmt(alvo)}</span>`:`<span>Progresso: ${atual}</span><span>Meta: ${alvo}</span>`;
-    const addBtn=isDin&&!win?`<div style="margin-top:8px;display:flex;gap:6px"><input id="av-${m.id}" type="number" step="0.01" placeholder="Adicionar..." class="fi3" style="max-width:130px;padding:5px 8px;font-size:.75rem"><button class="btn bp" style="padding:5px 10px;font-size:.72rem" onclick="const i=document.getElementById('av-${m.id}');const v=parseFloat(i.value)||0;if(v){const mt=S.metas.find(x=>x.id==='${m.id}');if(mt){mt.atual=(mt.atual||0)+v;i.value='';renderMetas();}}">+</button></div>`:'';
-    const updBtn=isPct&&!win?`<div style="margin-top:8px;display:flex;gap:6px"><input id="av-${m.id}" type="number" step="1" placeholder="Novo valor..." class="fi3" style="max-width:130px;padding:5px 8px;font-size:.75rem"><button class="btn bp" style="padding:5px 10px;font-size:.72rem" onclick="const i=document.getElementById('av-${m.id}');const v=parseFloat(i.value);if(!isNaN(v)){const mt=S.metas.find(x=>x.id==='${m.id}');if(mt){mt.atual=v;i.value='';renderMetas();}}">OK</button></div>`:'';
+    const addBtn=isDin?`<div style="margin-top:8px;display:flex;gap:6px"><input id="av-${m.id}" type="number" step="0.01" placeholder="Adicionar..." class="fi3" style="max-width:130px;padding:5px 8px;font-size:.75rem"><button class="btn bp" style="padding:5px 10px;font-size:.72rem" onclick="const i=document.getElementById('av-${m.id}');const v=parseFloat(i.value)||0;if(v){const mt=S.metas.find(x=>x.id==='${m.id}');if(mt){mt.atual=(mt.atual||0)+v;i.value='';renderMetas();}}">+</button></div>`:'';
+    const updBtn=isPct?`<div style="margin-top:8px;display:flex;gap:6px"><input id="av-${m.id}" type="number" step="1" placeholder="Novo valor..." class="fi3" style="max-width:130px;padding:5px 8px;font-size:.75rem"><button class="btn bp" style="padding:5px 10px;font-size:.72rem" onclick="const i=document.getElementById('av-${m.id}');const v=parseFloat(i.value);if(!isNaN(v)){const mt=S.metas.find(x=>x.id==='${m.id}');if(mt){mt.atual=v;i.value='';renderMetas();}}">OK</button></div>`:'';
     body=progressBar+`<div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:.7rem;color:var(--mu)">${label}</div>${fl>0?`<div style="font-family:var(--mo);font-size:.67rem;color:var(--mu);margin-top:3px">Falta${isDin?' '+fmt(fl):' '+fl}${prazoStr}</div>`:''}`+addBtn+updBtn;
   }
-  return `<div style="background:var(--sur);border:1px solid ${win?cor:'var(--bor)'};border-radius:10px;padding:14px;${win?'background:'+cor+'08;':''}"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px"><div style="flex:1"><div style="font-weight:700;font-size:.88rem;margin-bottom:3px">${m.nome}</div>${m.nota?`<div style="font-size:.75rem;color:var(--mu);font-style:italic;margin-bottom:4px">"${m.nota}"</div>`:''}<div style="display:flex;gap:5px;flex-wrap:wrap">${m.tipo?`<span style="font-family:var(--mo);font-size:.59rem;background:#f0ede7;color:var(--mu);padding:2px 6px;border-radius:20px">${m.tipo}</span>`:''}${win?`<span style="font-family:var(--mo);font-size:.59rem;background:${cor};color:#fff;padding:2px 6px;border-radius:20px">Concluida!</span>`:''}</div></div><div style="text-align:right;margin-left:10px"><div style="font-family:var(--mo);font-size:1.05rem;font-weight:600;color:${cor}">${isLivre&&m.status==='concluida'?'Feito':pct+'%'}</div><button class="db" onclick="S.metas=S.metas.filter(x=>x.id!=='${m.id}');renderMetas()" style="font-size:.7rem;color:var(--mu)">excluir</button></div></div>${body}</div>`;
+
+  // Badge no canto superior direito — percentual só para tipos com numero
+  const badge=isLivre?'':pct+'%';
+
+  return `<div style="background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:14px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:.88rem;margin-bottom:3px">${m.nome}</div>
+        ${m.nota?`<div style="font-size:.75rem;color:var(--mu);font-style:italic;margin-bottom:4px">"${m.nota}"</div>`:''}
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          ${m.tipo?`<span style="font-family:var(--mo);font-size:.59rem;background:#f0ede7;color:var(--mu);padding:2px 6px;border-radius:20px">${m.tipo}</span>`:''}
+          ${m.status==='pausada'?`<span style="font-family:var(--mo);font-size:.59rem;background:var(--wl);color:var(--w);padding:2px 6px;border-radius:20px">pausada</span>`:''}
+        </div>
+      </div>
+      <div style="text-align:right;margin-left:10px">
+        ${badge?`<div style="font-family:var(--mo);font-size:1.05rem;font-weight:600;color:${cor}">${badge}</div>`:''}
+        <button class="db" onclick="S.metas=S.metas.filter(x=>x.id!=='${m.id}');renderMetas()" style="font-size:.7rem;color:var(--mu)">excluir</button>
+      </div>
+    </div>
+    ${body}
+  </div>`;
 }
 
 // ── INVESTIMENTOS PAGE ──
