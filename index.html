@@ -324,20 +324,23 @@ input[type=month]:focus{border-color:var(--g);background:#fff;}
     <button class="sb-x" onclick="toggleSb()">&#8592;</button>
   </div>
   <nav>
-    <div class="sb-sec">Principal</div>
-    <div class="sb-it on" onclick="goVw('main',this)">Financas do Mes</div>
-    <div class="sb-sec">Analise</div>
-    <div class="sb-it" onclick="goVw('vg',this)">Visao Geral</div>
+    <div class="sb-sec">Geral</div>
+    <div class="sb-it on" id="sb-vg-btn" onclick="goVw('vg',this)">Visao Geral</div>
     <div class="sb-it" onclick="goVw('anual',this)">Controle Anual</div>
-    <div class="sb-sec">Planejamento</div>
-    <div class="sb-it" onclick="goVw('metas',this)">Objetivos e Metas</div>
+    <div class="sb-sec">Ana</div>
+    <div class="sb-it" onclick="goVw('main',this)">Financas</div>
+    <div class="sb-it" onclick="goVw('metas',this)">Metas</div>
     <div class="sb-it" onclick="goVw('invest',this)">Investimentos</div>
-    <div class="sb-sec">Studio</div>
-    <div class="sb-it" onclick="goVw('vitdsgn',this)">VITDSGN</div>
-    <div class="sb-sec">Casal</div>
-    <div class="sb-it" onclick="goVw('leticia',this)">Leticia</div>
-    <div class="sb-it" onclick="goVw('casal',this)">Nos Duas</div>
+    <div class="sb-it" onclick="goVw('emp-ana',this)">Empreendimentos</div>
+    <div class="sb-sec">Leticia</div>
+    <div class="sb-it" onclick="goVw('leticia',this)">Financas</div>
+    <div class="sb-it" onclick="goVw('metas-let',this)">Metas</div>
+    <div class="sb-it" onclick="goVw('invest-let',this)">Investimentos</div>
+    <div class="sb-it" onclick="goVw('emp-let',this)">Empreendimentos</div>
+    <div class="sb-sec">Juntas</div>
     <div class="sb-it" onclick="goVw('divconj',this)">Dividas Conjuntas</div>
+    <div class="sb-it" onclick="goVw('invest-conj',this)">Investimentos</div>
+    <div class="sb-it" onclick="goVw('metas-conj',this)">Metas Conjuntas</div>
   </nav>
 </aside>
 <button class="sb-btn" onclick="toggleSb()">&#8801;</button>
@@ -352,7 +355,7 @@ input[type=month]:focus{border-color:var(--g);background:#fff;}
     </div>
 
     <!-- MAIN -->
-    <div class="vw on" id="vw-main">
+    <div class="vw" id="vw-main">
 
       <!-- RESUMO ANA — mesmo formato da Leticia -->
       <div id="ana-resumo"></div>
@@ -394,7 +397,7 @@ input[type=month]:focus{border-color:var(--g);background:#fff;}
     </div>
 
     <!-- VISAO GERAL -->
-    <div class="vw" id="vw-vg">
+    <div class="vw on" id="vw-vg">
       <h2 class="sec">Visao Geral &mdash; <span id="vgm" style="font-weight:400;font-size:.82rem"></span></h2>
       <div id="vgc"></div>
     </div>
@@ -427,19 +430,23 @@ input[type=month]:focus{border-color:var(--g);background:#fff;}
     </div>
 
     <!-- LETICIA -->
-    <div class="vw" id="vw-leticia">
-      <div id="let-cnt"></div>
-    </div>
-
-    <!-- NOS DUAS -->
-    <div class="vw" id="vw-casal">
-      <div id="casal-cnt"></div>
-    </div>
-
+    <div class="vw" id="vw-leticia"><div id="let-cnt"></div></div>
+    <!-- METAS LETICIA -->
+    <div class="vw" id="vw-metas-let"><div id="mlet-cnt"></div></div>
+    <!-- INVEST LETICIA -->
+    <div class="vw" id="vw-invest-let"><div id="ilet-cnt"></div></div>
+    <!-- EMP LETICIA -->
+    <div class="vw" id="vw-emp-let"><div id="elet-cnt"></div></div>
+    <!-- EMP ANA -->
+    <div class="vw" id="vw-emp-ana"><div id="eana-cnt"></div></div>
+    <!-- INVEST CONJUNTO -->
+    <div class="vw" id="vw-invest-conj"><div id="iconj-cnt"></div></div>
+    <!-- METAS CONJUNTAS -->
+    <div class="vw" id="vw-metas-conj"><div id="mconj-cnt"></div></div>
     <!-- DIVIDAS CONJUNTAS -->
-    <div class="vw" id="vw-divconj">
-      <div id="divconj-cnt"></div>
-    </div>
+    <div class="vw" id="vw-divconj"><div id="divconj-cnt"></div></div>
+    <!-- CASAL (legado) -->
+    <div class="vw" id="vw-casal"><div id="casal-cnt"></div></div>
 
   </div>
 </div>
@@ -595,8 +602,10 @@ let S={
   months:['Abril 2026'],activeMonth:'Abril 2026',
   salarios:{},dividasFixas:{},installments:[],statusMap:{},movimentos:{},aportes:[],metas:[],
   vitdsgn:{projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0,metas_meses:{}},
-  leticia:{salarios:[],dividasFixas:[],installments:[],aportes:[],activeMonth:'Maio 2026'},
-  casal:{metas:[],divConj:[],aportes:[],notas:''}
+  leticia:{salarios:[],dividasFixas:[],installments:[],aportes:[],metas:[],activeMonth:'Maio 2026'},
+  casal:{metas:[],divConj:[],aportes:[],notas:''},
+  empLet:{empresas:[],tarefas:[],ideias:[]},
+  reliquias:{itens:[]}
 };
 function gS(m){if(!S.salarios[m])S.salarios[m]=[];return S.salarios[m];}
 function gD(m){if(!S.dividasFixas[m])S.dividasFixas[m]=[];return S.dividasFixas[m];}
@@ -669,8 +678,10 @@ function doReset(){
   localStorage.removeItem(KEY);
   S={months:['Abril 2026'],activeMonth:'Abril 2026',salarios:{},dividasFixas:{},installments:[],statusMap:{},movimentos:{},aportes:[],metas:[],
   vitdsgn:{projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0,metas_meses:{}},
-  leticia:{salarios:[],dividasFixas:[],installments:[],aportes:[],activeMonth:'Maio 2026'},
-  casal:{metas:[],divConj:[],aportes:[],notas:''}};
+  leticia:{salarios:[],dividasFixas:[],installments:[],aportes:[],metas:[],activeMonth:'Maio 2026'},
+  casal:{metas:[],divConj:[],aportes:[],notas:''},
+  empLet:{empresas:[],tarefas:[],ideias:[]},
+  reliquias:{itens:[]}};
   fullRender();toast('Dados apagados');
 }
 function readDOM(){
@@ -706,19 +717,28 @@ function goVw(n,el){
   el?.classList.add('on');
   if(n==='vg')renderVG();
   if(n==='anual')renderAnual();
-  if(n==='metas')renderMetas();
   if(n==='invest')renderInvest();
-  if(n==='vitdsgn')renderVitdsgn();
+  if(n==='vitdsgn'){renderEmpAna();}
+  if(n==='emp-ana')renderEmpAna();
   if(n==='leticia')renderLeticia();
-  if(n==='casal')renderCasal();
+  if(n==='metas-let')renderMetasLet();
+  if(n==='invest-let')renderInvestLet();
+  if(n==='emp-let')renderEmpLet();
   if(n==='divconj')renderDivConj();
+  if(n==='invest-conj')renderInvestConj();
+  if(n==='metas-conj')renderMetasConj();
+  if(n==='casal')renderCasal();
 }
 function fullRender(){
   renderMNav();renderMC(S.activeMonth);renderFeed();renderAnaResumo();
   const av=document.querySelector('.vw.on');
-  if(av?.id==='vw-vg')renderVG();
-  if(av?.id==='vw-anual')renderAnual();
-  if(av?.id==='vw-metas')renderMetas();
+  if(!av)return;
+  const id=av.id.replace('vw-','');
+  const map={vg:renderVG,anual:renderAnual,metas:renderMetas,invest:renderInvest,
+    'emp-ana':renderEmpAna,leticia:renderLeticia,'metas-let':renderMetasLet,
+    'invest-let':renderInvestLet,'emp-let':renderEmpLet,divconj:renderDivConj,
+    'invest-conj':renderInvestConj,'metas-conj':renderMetasConj,casal:renderCasal};
+  if(map[id])map[id]();
 }
 
 function renderAnaResumo(){
@@ -1010,83 +1030,834 @@ ${ps.map(p=>{const pr=tot*Math.pow(1+TAM,p.m),gn=pr-tot;return`<div style="displ
 </div></div>`;
 }
 
-// ── VISAO GERAL ──
+// ── VISAO GERAL (JOINT) ──
 function renderVG(){
-  const m=S.activeMonth;sel('vgm',m);const e=document.getElementById('vgc');if(!e)return;
-  const rec=gS(m).reduce((s,x)=>s+pv(x.valor),0);
-  const td=gD(m).reduce((s,x)=>s+pv(x.valor),0)+gI(m).reduce((s,i)=>s+i.vp,0);
-  const mvl=gMv(m).filter(x=>x.t==='in').reduce((s,x)=>s+x.v,0)-gMv(m).filter(x=>x.t==='out').reduce((s,x)=>s+x.v,0);
-  const sal=rec-td+mvl;const pct=rec>0?Math.round(td/rec*100):0;
-  const m20=rec*.2,tiv=(S.aportes||[]).reduce((s,a)=>s+a.v,0);
-  let si,sc;
-  if(pct<=50){si='Excelente';sc='var(--g)';}else if(pct<=70){si='Boa';sc='var(--w)';}else if(pct<=90){si='Atencao';sc='var(--w)';}else{si='Critica';sc='var(--r)';}
-  const adv=[...gD(m).map(d=>({n:d.desc,d:parseInt(d.dia)||0,v:pv(d.valor),s:d.status})),...gI(m).map(it=>({n:`${it.desc} (${it.pa}/${it.tp<=120?it.tp:'cont.'})`,d:it.cartao==='d08'?8:it.cartao==='d15'?15:it.cartao==='d23'?23:25,v:it.vp,s:gSt(m,it.id)}))].filter(d=>d.s!=='pago').sort((a,b)=>a.d-b.d).slice(0,8);
-  const pm=addM(m,1);
-  const enc=S.installments.filter(it=>{if(it.tp>24)return false;const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;const mf=addM(ms,it.tp-1);return mf===m||mf===pm;});
-  const libM=enc.filter(it=>{const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;return addM(ms,it.tp-1)===m;}).reduce((s,it)=>s+it.vp,0);
-  const libP=enc.filter(it=>{const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;return addM(ms,it.tp-1)===pm;}).reduce((s,it)=>s+it.vp,0);
+  const e=document.getElementById('vgc'); if(!e) return;
+  const m=S.activeMonth;
+  const pm=addM(m,1), pm2=addM(m,2);
+  const L=gLet();
+
+  // ANA
+  const aRec=gS(m).reduce((s,x)=>s+pv(x.valor),0);
+  const aDix=gD(m).reduce((s,x)=>s+pv(x.valor),0);
+  const aInst=gI(m).reduce((s,i)=>s+i.vp,0);
+  const aDiv=aDix+aInst;
+  const aSal=aRec-aDiv;
+  const aPct=aRec>0?Math.min(100,Math.round(aDiv/aRec*100)):0;
+  const aInv=(S.aportes||[]).reduce((s,a)=>s+a.v,0);
+
+  // LETICIA
+  const lRec=L.salarios.reduce((s,x)=>s+pv(x.valor),0);
+  const lDix=L.dividasFixas.reduce((s,x)=>s+pv(x.valor),0);
+  const lInst=L.installments.reduce((s,x)=>s+x.vp,0);
+  const lDiv=lDix+lInst;
+  const lSal=lRec-lDiv;
+  const lPct=lRec>0?Math.min(100,Math.round(lDiv/lRec*100)):0;
+  const lInv=L.aportes.reduce((s,a)=>s+a.v,0);
+
+  // TOTAL
+  const tRec=aRec+lRec, tDiv=aDiv+lDiv, tSal=aSal+lSal, tInv=aInv+lInv;
+  const tPct=tRec>0?Math.min(100,Math.round(tDiv/tRec*100)):0;
+
+  // Proximas dividas Ana (2 meses)
+  const advAna=[m,pm].flatMap(mes=>[
+    ...gD(mes).map(d=>({n:d.desc,quem:'Ana',dia:parseInt(d.dia)||0,v:pv(d.valor),s:d.status,mes})),
+    ...S.installments.filter(it=>{const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;return mi(mes)>=mi(ms)&&mi(mes)<=mi(addM(ms,it.tp-1));})
+      .map(it=>({n:it.desc,quem:'Ana',dia:it.cartao==='d08'?8:it.cartao==='d15'?15:it.cartao==='d23'?23:25,v:it.vp,s:gSt(mes,it.id),mes}))
+  ]).filter(d=>d.s!=='pago').sort((a,b)=>mi(a.mes)-mi(b.mes)||a.dia-b.dia).slice(0,6);
+
+  // Proximas dividas Leticia (2 meses)
+  const advLet=[m,pm].flatMap(mes=>[
+    ...L.dividasFixas.map(d=>({n:d.desc,quem:'Leticia',dia:parseInt(d.dia)||0,v:pv(d.valor),s:d.status,mes})),
+    ...L.installments.map(it=>{const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;const ativo=mi(mes)>=mi(ms)&&mi(mes)<=mi(addM(ms,it.tp-1));return ativo?{n:it.desc,quem:'Leticia',dia:it.cartao==='d08'?8:it.cartao==='d15'?15:it.cartao==='d23'?23:25,v:it.vp,s:'pendente',mes}:null;}).filter(Boolean)
+  ]).sort((a,b)=>mi(a.mes)-mi(b.mes)||a.dia-b.dia).slice(0,6);
+
+  // Encerrando em breve - Ana
+  const encAna=S.installments.filter(it=>{if(it.tp>24)return false;const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;const mf=addM(ms,it.tp-1);return mf===m||mf===pm||mf===pm2;});
+  // Saldo futuro Ana
+  const libAna=encAna.filter(it=>{const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;return addM(ms,it.tp-1)===m;}).reduce((s,it)=>s+it.vp,0)+
+               encAna.filter(it=>{const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;return addM(ms,it.tp-1)===pm;}).reduce((s,it)=>s+it.vp,0);
+  // Metas em andamento
+  const metasAtivas=(S.metas||[]).filter(m2=>m2.tipo!=='livre'?(m2.atual||0)<m2.alvo:m2.status!=='concluida').slice(0,4);
+  const metasLetAtivas=(gLet().metas_ativas||[]);
+
+  const saude=(p)=>p<=50?['Excelente','var(--g)']:p<=70?['Boa','#a020c8']:p<=90?['Atencao','var(--w)']:['Critica','var(--r)'];
+  const [aSi,aSc]=saude(aPct), [lSi,lSc]=saude(lPct), [tSi,tSc]=saude(tPct);
+
+  // Gauge SVG helper
+  const gauge=(pct,cor,size=100)=>{const r=38,circ=Math.PI*r,dash=circ*(pct/100);return`<svg viewBox="0 0 100 62" style="width:${size}px;height:auto"><path d="M12,56 A38,38 0 0,1 88,56" fill="none" stroke="#e8e5df" stroke-width="9" stroke-linecap="round"/><path d="M12,56 A38,38 0 0,1 88,56" fill="none" stroke="${cor}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${dash} ${circ}"/><text x="50" y="50" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="700" fill="${cor}">${pct}%</text></svg>`;};
+
   e.innerHTML=`
-<div class="ca" style="background:${pct>70?'var(--wl)':'var(--gl)'};border:1px solid ${pct>70?'#f5d9a0':'#a8d5b8'};color:${pct>70?'var(--w)':'#1b4332'};margin-bottom:16px">
-<b>Saude financeira: ${si}</b> &mdash; ${pct}% da renda comprometida com dividas.</div>
-<div class="vgg">
-<div class="vgc"><div class="vgl">Receita total</div><div class="vgv cg">${fmt(rec)}</div></div>
-<div class="vgc"><div class="vgl">Total dividas</div><div class="vgv cr">${fmt(td)}</div></div>
-<div class="vgc"><div class="vgl">Saldo livre</div><div class="vgv" style="color:${sal>=0?'var(--g)':'var(--r)'}">${fmt(sal)}</div></div>
-<div class="vgc"><div class="vgl">Meta 20% investir</div><div class="vgv cp">${fmt(m20)}<div style="font-size:.65rem;color:${tiv>=m20?'var(--g)':'var(--w)'};margin-top:2px">${tiv>=m20?'Meta atingida':'Falta '+fmt(m20-tiv)}</div></div></div>
-</div>
-<h2 class="sec">Proximas dividas a pagar</h2>
-<div style="background:var(--sur);border:1px solid var(--bor);border-radius:7px;overflow:hidden">
-${adv.length?adv.map(d=>`<div style="display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid var(--bor);font-size:.82rem"><span style="flex:1">${d.n}</span><span style="font-family:var(--mo);font-size:.67rem;color:var(--mu);margin:0 10px">dia ${d.d}</span><span class="mn red">${fmt(d.v)}</span></div>`).join(''):'<div style="padding:14px;color:var(--mu);font-style:italic;font-size:.82rem">Todas pagas!</div>'}
-</div>
-${enc.length?`<h2 class="sec" style="margin-top:20px">Encerrando em breve</h2>
-<div style="background:var(--sur);border:1px solid var(--bor);border-radius:7px;overflow:hidden">
-${enc.map(it=>{const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;const mf=addM(ms,it.tp-1);return`<div style="display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid var(--bor);font-size:.82rem"><span style="flex:1">${it.desc} <span class="tag ${mf===m?'tp':'tb'}" style="font-size:.59rem">${mf===m?'este mes':'proximo mes'}</span></span><span class="mn cg">libera ${fmt(it.vp)}/mes</span></div>`;}).join('')}
-</div>`:''}
-<h2 class="sec" style="margin-top:20px">Previsao de saldo</h2>
-<div style="background:var(--sur);border:1px solid var(--bor);border-radius:7px;padding:14px">
-<div class="ar"><span class="ak">Saldo atual</span><span class="av" style="color:${sal>=0?'var(--g)':'var(--r)'}">${fmt(sal)}</span></div>
-<div class="ar"><span class="ak">+ Libera este mes</span><span class="av cg">+${fmt(libM)}</span></div>
-<div class="ar"><span class="ak">+ Libera proximo mes</span><span class="av cg">+${fmt(libP)}</span></div>
-<div class="ar" style="border-top:1.5px solid var(--bor2);margin-top:5px;padding-top:5px;font-weight:700"><span>Saldo previsto</span><span class="av cg">${fmt(sal+libM+libP)}</span></div>
-</div>`;
+  <!-- PAGE TITLE -->
+  <div class="sec-header">
+    <div>
+      <div class="sec-name" style="background:linear-gradient(90deg,#7b2ff7,#e8529a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:1.6rem">Visao Geral</div>
+      <div class="sec-sub">${m} — panorama completo de Ana e Leticia</div>
+    </div>
+  </div>
+
+  <!-- BLOCO CONJUNTO -->
+  <div style="background:linear-gradient(135deg,#2a1535,#3d1a5a);border-radius:14px;padding:20px;margin-bottom:20px;color:#fff">
+    <div style="font-family:var(--mo);font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;opacity:.6;margin-bottom:12px">Riqueza Conjunta</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+      ${[{l:'Renda total',v:tRec,c:'#da6ef5'},{l:'Dividas totais',v:tDiv,c:'#ff8fab'},{l:'Saldo conjunto',v:tSal,c:tSal>=0?'#52c77a':'#ff6b6b'},{l:'Investimentos',v:tInv,c:'#c3b1e1'}]
+        .map(x=>`<div style="background:rgba(255,255,255,.07);border-radius:10px;padding:12px 14px"><div style="font-family:var(--mo);font-size:.58rem;opacity:.6;text-transform:uppercase;margin-bottom:4px">${x.l}</div><div style="font-family:var(--mo);font-size:1.1rem;font-weight:600;color:${x.c}">${fmt(x.v)}</div></div>`).join('')}
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="flex:1;height:8px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${tPct}%;background:linear-gradient(90deg,#7b2ff7,#e8529a);border-radius:99px;transition:width .5s"></div>
+      </div>
+      <span style="font-family:var(--mo);font-size:.7rem;opacity:.7">${tPct}% comprometido · Saude: <b style="color:${tSc}">${tSi}</b></span>
+    </div>
+  </div>
+
+  <!-- ANA x LETICIA SIDE BY SIDE -->
+  <div class="grid2" style="margin-bottom:20px">
+    <!-- ANA -->
+    <div style="background:linear-gradient(160deg,#f5eeff,#ede0ff);border:1.5px solid #c8a0f0;border-radius:14px;padding:18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:1.1rem;background:linear-gradient(90deg,#7b2ff7,#5b1fa6);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Ana</div>
+        <div style="text-align:center">${gauge(aPct,aSc,80)}<div style="font-family:var(--mo);font-size:.62rem;color:${aSc};font-weight:600;margin-top:-4px">${aSi}</div></div>
+      </div>
+      ${[{l:'Receita',v:aRec,c:'var(--g)'},{l:'Dividas',v:aDiv,c:'var(--r)'},{l:'Saldo livre',v:aSal,c:aSal>=0?'var(--g)':'var(--r)'},{l:'Investido',v:aInv,c:'#7b2ff7'}]
+        .map(x=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #dcc8f8;font-size:.82rem"><span style="color:#5b3a8a">${x.l}</span><span style="font-family:var(--mo);font-weight:600;color:${x.c}">${fmt(x.v)}</span></div>`).join('')}
+      <div style="margin-top:10px;height:5px;background:#dcc8f8;border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${aPct}%;background:linear-gradient(90deg,#7b2ff7,#9b50f7);border-radius:99px"></div>
+      </div>
+    </div>
+    <!-- LETICIA -->
+    <div style="background:linear-gradient(160deg,#fff0f8,#ffd6f0);border:1.5px solid #f0a0d0;border-radius:14px;padding:18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:1.1rem;background:linear-gradient(90deg,#c0407a,#e8529a);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Leticia</div>
+        <div style="text-align:center">${gauge(lPct,lSc,80)}<div style="font-family:var(--mo);font-size:.62rem;color:${lSc};font-weight:600;margin-top:-4px">${lSi}</div></div>
+      </div>
+      ${[{l:'Receita',v:lRec,c:'var(--g)'},{l:'Dividas',v:lDiv,c:'var(--r)'},{l:'Saldo livre',v:lSal,c:lSal>=0?'var(--g)':'var(--r)'},{l:'Investido',v:lInv,c:'#c0407a'}]
+        .map(x=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0c8e0;font-size:.82rem"><span style="color:#8a3060">${x.l}</span><span style="font-family:var(--mo);font-weight:600;color:${x.c}">${fmt(x.v)}</span></div>`).join('')}
+      <div style="margin-top:10px;height:5px;background:#f0c8e0;border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${lPct}%;background:linear-gradient(90deg,#c0407a,#e8529a);border-radius:99px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVISAO PROXIMO MES -->
+  <div class="panel" style="margin-bottom:16px">
+    <h3 style="background:linear-gradient(90deg,#7b2ff7,#e8529a);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Previsao — proximos 2 meses</h3>
+    <div class="grid3">
+      ${[m,pm,pm2].map((mes,idx)=>{
+        const aR2=gS(mes).reduce((s,x)=>s+pv(x.valor),0);
+        const aD2=gD(mes).reduce((s,x)=>s+pv(x.valor),0)+S.installments.filter(it=>{const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;return mi(mes)>=mi(ms)&&mi(mes)<=mi(addM(ms,it.tp-1));}).reduce((s,i)=>s+i.vp,0);
+        const aSl2=aR2-aD2;
+        const lSl2=lRec-lDiv; // simplified for future months
+        const tSl2=aSl2+lSl2;
+        const isNow=idx===0;
+        return `<div style="background:${isNow?'linear-gradient(135deg,#f5eeff,#ede0ff)':'var(--bg)'};border:${isNow?'1.5px solid #c8a0f0':'1px solid var(--bor)'};border-radius:10px;padding:14px">
+          <div style="font-family:var(--mo);font-size:.59rem;text-transform:uppercase;color:${isNow?'#7b2ff7':'var(--mu)'};margin-bottom:6px">${idx===0?'Atual':idx===1?'Proximo':'Em 2 meses'}</div>
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:8px">${mes}</div>
+          <div style="font-size:.8rem;color:var(--mu);margin-bottom:2px">Ana: <b style="color:${aSl2>=0?'var(--g)':'var(--r)'};font-family:var(--mo)">${fmt(aSl2)}</b></div>
+          <div style="font-size:.8rem;color:var(--mu);margin-bottom:2px">Leticia: <b style="color:${lSl2>=0?'var(--g)':'var(--r)'};font-family:var(--mo)">${fmt(lSl2)}</b></div>
+          <div style="border-top:1px solid var(--bor2);margin-top:8px;padding-top:6px;font-size:.82rem">Total livre: <b style="font-family:var(--mo);color:${tSl2>=0?'#7b2ff7':'var(--r)'}">${fmt(tSl2)}</b></div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  <!-- DIVIDAS PROXIMAS - ANA e LETICIA -->
+  <div class="grid2" style="margin-bottom:16px">
+    <div class="panel">
+      <h3 style="color:#7b2ff7">Proximas dividas — Ana</h3>
+      ${advAna.length===0?'<div style="font-size:.81rem;color:var(--mu);font-style:italic">Tudo em dia!</div>':
+      advAna.map(d=>`<div class="row-item">
+        <div class="dot" style="background:${d.mes===m?'#7b2ff7':'#c8a0f0'}"></div>
+        <div style="flex:1"><div style="font-size:.82rem;font-weight:600">${d.n}</div>
+        <div style="font-family:var(--mo);font-size:.63rem;color:var(--mu)">${d.mes} · dia ${d.dia}</div></div>
+        <span style="font-family:var(--mo);font-size:.8rem;color:var(--r);font-weight:600">${fmt(d.v)}</span>
+      </div>`).join('')}
+    </div>
+    <div class="panel">
+      <h3 style="color:#e8529a">Proximas dividas — Leticia</h3>
+      ${advLet.length===0?'<div style="font-size:.81rem;color:var(--mu);font-style:italic">Tudo em dia!</div>':
+      advLet.map(d=>`<div class="row-item">
+        <div class="dot" style="background:${d.mes===m?'#e8529a':'#f0c8e0'}"></div>
+        <div style="flex:1"><div style="font-size:.82rem;font-weight:600">${d.n}</div>
+        <div style="font-family:var(--mo);font-size:.63rem;color:var(--mu)">${d.mes} · dia ${d.dia}</div></div>
+        <span style="font-family:var(--mo);font-size:.8rem;color:var(--r);font-weight:600">${fmt(d.v)}</span>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- ENCERRANDO EM BREVE + LIBERACAO -->
+  ${encAna.length>0?`<div class="panel" style="margin-bottom:16px">
+    <h3>Parcelas encerrando em breve — Ana</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+      ${encAna.map(it=>{const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;const mf=addM(ms,it.tp-1);const urgente=mf===m;
+        return`<div style="background:${urgente?'#f5eeff':'var(--bg)'};border:1px solid ${urgente?'#c8a0f0':'var(--bor)'};border-radius:8px;padding:11px 13px">
+          <div style="font-weight:600;font-size:.83rem;margin-bottom:3px">${it.desc}</div>
+          <div style="display:flex;justify-content:space-between">
+            <span class="pill ${urgente?'pill-p':'pill-y'}" style="font-size:.58rem">${urgente?'este mes':'proximo mes'}</span>
+            <span style="font-family:var(--mo);font-size:.8rem;color:var(--g);font-weight:600">libera ${fmt(it.vp)}</span>
+          </div>
+        </div>`;}).join('')}
+    </div>
+    <div style="margin-top:12px;padding:10px 14px;background:#f5eeff;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:.82rem;color:#5b3a8a">Total que libera em ${m} + ${pm}:</span>
+      <span style="font-family:var(--mo);font-weight:700;color:#7b2ff7;font-size:1rem">${fmt(libAna)}</span>
+    </div>
+  </div>`:'' }
+
+  <!-- METAS EM ANDAMENTO -->
+  ${metasAtivas.length>0?`<div class="panel" style="margin-bottom:16px">
+    <h3 style="background:linear-gradient(90deg,#7b2ff7,#e8529a);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Metas em andamento — Ana</h3>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+      ${metasAtivas.map(mt=>{
+        const isDin=mt.tipo==='dinheiro'||!mt.tipo;
+        const pct2=mt.alvo>0?Math.min(100,Math.round((mt.atual||0)/mt.alvo*100)):0;
+        const cats={financeira:'#7b2ff7',pessoal:'var(--b)',profissional:'var(--g)'};
+        const cor2=cats[mt.cat]||'#7b2ff7';
+        return`<div style="background:var(--bg);border:1px solid var(--bor);border-radius:8px;padding:12px">
+          <div style="font-weight:600;font-size:.83rem;margin-bottom:4px">${mt.nome}</div>
+          <div style="height:5px;background:var(--bor);border-radius:99px;overflow:hidden;margin-bottom:4px">
+            <div style="height:100%;width:${pct2}%;background:${cor2};border-radius:99px"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:.65rem;color:var(--mu)">
+            <span>${pct2}%</span><span>${isDin?fmt(mt.alvo):mt.alvo}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`:''}
+
+  <!-- INVESTIMENTOS RESUMO -->
+  <div class="panel" style="margin-bottom:16px">
+    <h3>Investimentos — panorama</h3>
+    <div class="grid3">
+      <div style="text-align:center;padding:10px">
+        <div style="font-family:var(--mo);font-size:.59rem;color:var(--mu);text-transform:uppercase;margin-bottom:5px">Ana</div>
+        <div style="font-family:var(--mo);font-size:1.1rem;font-weight:600;color:#7b2ff7">${fmt(aInv)}</div>
+        <div style="font-family:var(--mo);font-size:.65rem;color:var(--mu);margin-top:2px">em ${(S.aportes||[]).length} aporte${(S.aportes||[]).length!==1?'s':''}</div>
+      </div>
+      <div style="text-align:center;padding:10px;border-left:1px solid var(--bor);border-right:1px solid var(--bor)">
+        <div style="font-family:var(--mo);font-size:.59rem;color:var(--mu);text-transform:uppercase;margin-bottom:5px">Leticia</div>
+        <div style="font-family:var(--mo);font-size:1.1rem;font-weight:600;color:#e8529a">${fmt(lInv)}</div>
+        <div style="font-family:var(--mo);font-size:.65rem;color:var(--mu);margin-top:2px">em ${L.aportes.length} aporte${L.aportes.length!==1?'s':''}</div>
+      </div>
+      <div style="text-align:center;padding:10px">
+        <div style="font-family:var(--mo);font-size:.59rem;color:var(--mu);text-transform:uppercase;margin-bottom:5px">Total</div>
+        <div style="font-family:var(--mo);font-size:1.1rem;font-weight:600;color:#5b1fa6">${fmt(tInv)}</div>
+        <div style="font-family:var(--mo);font-size:.65rem;color:var(--mu);margin-top:2px">em ${(gCasal().aportes||[]).length} conjunto${(gCasal().aportes||[]).length!==1?'s':''}</div>
+      </div>
+    </div>
+    <!-- mini projecao 1 ano -->
+    <div style="margin-top:12px;padding:12px;background:#f5eeff;border-radius:8px">
+      <div style="font-family:var(--mo);font-size:.6rem;color:var(--mu);text-transform:uppercase;margin-bottom:8px">Projecao 105% CDI — 1 ano</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        ${[{l:'Ana',v:aInv,c:'#7b2ff7'},{l:'Leticia',v:lInv,c:'#e8529a'},{l:'Total',v:tInv,c:'#5b1fa6'}].map(x=>{
+          const proj=projCompound(x.v,CDI_AA*1.05,12),g=proj-x.v;
+          return`<div><span style="font-family:var(--mo);font-size:.68rem;color:${x.c};font-weight:600">${x.l}</span>
+            <div style="font-family:var(--mo);font-size:.85rem;font-weight:600;color:${x.c}">${fmt(proj)}</div>
+            <div style="font-family:var(--mo);font-size:.62rem;color:var(--mu)">+${fmt(g)} rendimento</div>
+          </div>`;}).join('')}
+      </div>
+    </div>
+  </div>`;
+  sel('vgm',m);
 }
 
-// ── ANUAL ──
+// ── CONTROLE ANUAL (JOINT) ──
 function renderAnual(){
-  const e=document.getElementById('anc');if(!e)return;
-  const ms=S.months.filter(m=>m.includes('2026'));
-  let mxi={m:'--',v:0},mxe={m:'--',v:-Infinity};
-  ms.forEach(m=>{
+  const e=document.getElementById('anc'); if(!e) return;
+  const L=gLet();
+  // Build next 12 months from activeMonth
+  const meses12=[];for(let i=0;i<12;i++)meses12.push(addM(S.activeMonth,i));
+  const aInvTotal=(S.aportes||[]).reduce((s,a)=>s+a.v,0);
+  const lInvTotal=L.aportes.reduce((s,a)=>s+a.v,0);
+  const tInvTotal=aInvTotal+lInvTotal;
+  // Stats
+  let mxi={m:'--',v:0},mxeA={m:'--',v:-Infinity},mxeL={m:'--',v:-Infinity};
+  S.months.filter(m=>m.includes('2026')).forEach(m=>{
     const rec=gS(m).reduce((s,x)=>s+pv(x.valor),0);
-    const div=gD(m).reduce((s,x)=>s+pv(x.valor),0)+gI(m).reduce((s,i)=>s+i.vp,0);
+    const div=gD(m).reduce((s,x)=>s+pv(x.valor),0)+S.installments.filter(it=>{const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;return mi(m)>=mi(ms)&&mi(m)<=mi(addM(ms,it.tp-1));}).reduce((s,i)=>s+i.vp,0);
     const inv=(S.aportes||[]).filter(a=>a.m===m).reduce((s,a)=>s+a.v,0);
-    if(inv>mxi.v)mxi={m,v:inv};if(rec-div>mxe.v)mxe={m:m,v:rec-div};
+    if(inv>mxi.v)mxi={m,v:inv};
+    if(rec-div>mxeA.v)mxeA={m,v:rec-div};
   });
-  const tiv=(S.aportes||[]).filter(a=>a.m&&a.m.includes('2026')).reduce((s,a)=>s+a.v,0);
-  const cd=[...ms].reverse().map(m=>{
-    const rec=gS(m).reduce((s,x)=>s+pv(x.valor),0);
-    const div=gD(m).reduce((s,x)=>s+pv(x.valor),0)+gI(m).reduce((s,i)=>s+i.vp,0);
-    return{l:m.split(' ')[0].slice(0,3),rec,div};
+
+  // Chart data — 12 months
+  const chartD=meses12.map(m=>{
+    const aR=gS(m).reduce((s,x)=>s+pv(x.valor),0);
+    const aD=gD(m).reduce((s,x)=>s+pv(x.valor),0)+S.installments.filter(it=>{const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;return mi(m)>=mi(ms)&&mi(m)<=mi(addM(ms,it.tp-1));}).reduce((s,i)=>s+i.vp,0);
+    const lR=L.salarios.reduce((s,x)=>s+pv(x.valor),0);
+    const lD=L.dividasFixas.reduce((s,x)=>s+pv(x.valor),0)+L.installments.reduce((s,x)=>s+x.vp,0);
+    return{l:m.split(' ')[0].slice(0,3),m,aR,aD,lR,lD,tR:aR+lR,tD:aD+lD,tS:(aR-aD)+(lR-lD)};
   });
-  const mx=Math.max(1,...cd.map(d=>Math.max(d.rec,d.div)));
+  const maxBar=Math.max(1,...chartD.map(d=>Math.max(d.tR,d.tD)));
+
+  // Investment projection 6 months
+  const invProj=[1,2,3,4,5,6].map(i=>({l:addM(S.activeMonth,i-1).split(' ')[0].slice(0,3),ana:projCompound(aInvTotal,CDI_AA*1.05,i),let:projCompound(lInvTotal,CDI_AA*1.05,i),tot:projCompound(tInvTotal,CDI_AA*1.05,i)}));
+  const maxInv=Math.max(1,...invProj.map(d=>d.tot));
+
   e.innerHTML=`
-<div class="am">
-<div class="amc"><div class="aml">Mais investiu</div><div class="amv">${mxi.m.split(' ')[0]}</div><div style="font-family:var(--mo);font-size:.69rem;color:var(--mu)">${fmt(mxi.v)}</div></div>
-<div class="amc"><div class="aml">Mais economizou</div><div class="amv">${mxe.m.split(' ')[0]}</div><div style="font-family:var(--mo);font-size:.69rem;color:var(--mu)">${fmt(mxe.v)}</div></div>
-<div class="amc"><div class="aml">Total investido 2026</div><div class="amv">${fmt(tiv)}</div></div>
-</div>
-<div class="cw3"><div style="font-size:.8rem;font-weight:700;margin-bottom:11px">Receita x Dividas por mes</div>
-<div class="bc">${cd.map(d=>{const hr=mx>0?Math.round((d.rec/mx)*85):0,hd=mx>0?Math.round((d.div/mx)*85):0;return`<div class="bg2"><div class="bw"><div class="br" style="background:#a020c8;opacity:.8;height:${hr}px"></div><div class="br" style="background:var(--r);opacity:.7;height:${hd}px"></div></div><div class="bl">${d.l}</div></div>`;}).join('')}</div>
-<div style="display:flex;gap:12px;margin-top:8px"><span style="font-family:var(--mo);font-size:.67rem;color:var(--g)">● Receita</span><span style="font-family:var(--mo);font-size:.67rem;color:var(--r)">● Dividas</span></div>
-</div>
-${ms.map(m=>{
-  const rec=gS(m).reduce((s,x)=>s+pv(x.valor),0);
-  const div=gD(m).reduce((s,x)=>s+pv(x.valor),0)+gI(m).reduce((s,i)=>s+i.vp,0);
-  const sal=rec-div;const inv=(S.aportes||[]).filter(a=>a.m===m).reduce((s,a)=>s+a.v,0);
-  const id='ma-'+m.replace(' ','-');
-  return`<div class="mah" id="${id}"><div class="mhh" onclick="document.getElementById('${id}').classList.toggle('open')"><span class="mha">&#9654;</span><span style="font-weight:700;font-size:.85rem;flex:1">${m}</span><span style="font-family:var(--mo);font-size:.69rem;color:${sal>=0?'var(--g)':'var(--r)'}">${fmt(sal)}</span></div>
-<div class="mhb"><div class="ar"><span class="ak">Receitas</span><span class="av cg">${fmt(rec)}</span></div><div class="ar"><span class="ak">Dividas</span><span class="av cr">${fmt(div)}</span></div><div class="ar"><span class="ak">Saldo</span><span class="av" style="color:${sal>=0?'var(--g)':'var(--r)'}">${fmt(sal)}</span></div><div class="ar"><span class="ak">Investido</span><span class="av cp">${fmt(inv)}</span></div></div></div>`;
-}).join('')}`;
+  <div class="sec-header">
+    <div>
+      <div class="sec-name" style="background:linear-gradient(90deg,#7b2ff7,#e8529a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:1.6rem">Controle Anual</div>
+      <div class="sec-sub">Proximos 12 meses — visao conjunta de Ana e Leticia</div>
+    </div>
+  </div>
+
+  <!-- DESTAQUES -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+    <div class="kpi accent"><div class="kpi-l">Investido — Ana</div><div class="kpi-v">${fmt(aInvTotal)}</div></div>
+    <div class="kpi pink"><div class="kpi-l">Investido — Leticia</div><div class="kpi-v">${fmt(lInvTotal)}</div></div>
+    <div class="kpi"><div class="kpi-l">Total investido</div><div class="kpi-v" style="color:#7b2ff7">${fmt(tInvTotal)}</div></div>
+    <div class="kpi"><div class="kpi-l">Projecao 1 ano</div><div class="kpi-v" style="color:var(--g)">${fmt(projCompound(tInvTotal,CDI_AA*1.05,12))}</div><div class="kpi-s">a 105% CDI</div></div>
+  </div>
+
+  <!-- GRAFICO 12 MESES -->
+  <div class="panel" style="margin-bottom:16px">
+    <div style="font-size:.87rem;font-weight:700;margin-bottom:12px">Receita conjunta x Dividas — 12 meses</div>
+    <div style="overflow-x:auto">
+    <svg viewBox="0 0 ${meses12.length*56+20} 120" style="width:100%;min-width:${meses12.length*48}px;height:120px">
+      ${chartD.map((d,i)=>{
+        const bw=18,gap=4,pair=(bw*2+gap),space=10,xp=i*(pair+space)+10;
+        const hr=Math.round((d.tR/maxBar)*90),hd=Math.round((d.tD/maxBar)*90);
+        const isCur=d.m===S.activeMonth;
+        return`<g>
+          ${isCur?`<rect x="${xp-3}" y="0" width="${pair+6}" height="100" rx="4" fill="#7b2ff715"/>`:''}
+          <rect x="${xp}" y="${100-hr}" width="${bw}" height="${hr}" rx="3" fill="#7b2ff7" opacity="${isCur?'1':'.65'}"/>
+          <rect x="${xp+bw+gap}" y="${100-hd}" width="${bw}" height="${hd}" rx="3" fill="#e8529a" opacity="${isCur?'1':'.65'}"/>
+          <text x="${xp+bw}" y="112" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="${isCur?'#7b2ff7':'#8a8478'}">${d.l}</text>
+          ${d.tS>0?`<text x="${xp+bw}" y="${95-Math.max(hr,hd)}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" fill="#5b1fa6">+${Math.round(d.tS/1000)}k</text>`:''}
+        </g>`;}).join('')}
+    </svg>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:6px">
+      <span style="font-family:var(--mo);font-size:.67rem;color:#7b2ff7">■ Receita conjunta</span>
+      <span style="font-family:var(--mo);font-size:.67rem;color:#e8529a">■ Dividas conjuntas</span>
+    </div>
+  </div>
+
+  <!-- PROJECAO INVESTIMENTO 6 MESES -->
+  <div class="panel" style="margin-bottom:16px">
+    <div style="font-size:.87rem;font-weight:700;margin-bottom:12px">Projecao de investimentos — proximos 6 meses (105% CDI)</div>
+    <div style="overflow-x:auto">
+    <svg viewBox="0 0 380 110" style="width:100%;height:110px">
+      ${invProj.map((d,i)=>{
+        const bw=20,gap=4,pair=(bw*3+gap*2),space=8,xp=i*(pair+space)+10;
+        const ha=Math.round((d.ana/maxInv)*85),hl=Math.round((d.let/maxInv)*85),ht=Math.round((d.tot/maxInv)*85);
+        return`<g>
+          <rect x="${xp}" y="${95-ha}" width="${bw}" height="${ha}" rx="3" fill="#7b2ff7" opacity=".85"/>
+          <rect x="${xp+bw+gap}" y="${95-hl}" width="${bw}" height="${hl}" rx="3" fill="#e8529a" opacity=".85"/>
+          <rect x="${xp+bw*2+gap*2}" y="${95-ht}" width="${bw}" height="${ht}" rx="3" fill="#5b1fa6" opacity=".7"/>
+          <text x="${xp+bw+gap}" y="105" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#8a8478">${d.l}</text>
+        </g>`;}).join('')}
+    </svg>
+    </div>
+    <div style="display:flex;gap:14px;margin-top:4px">
+      <span style="font-family:var(--mo);font-size:.65rem;color:#7b2ff7">■ Ana</span>
+      <span style="font-family:var(--mo);font-size:.65rem;color:#e8529a">■ Leticia</span>
+      <span style="font-family:var(--mo);font-size:.65rem;color:#5b1fa6">■ Total</span>
+    </div>
+    <div style="overflow-x:auto;margin-top:12px">
+    <table style="width:100%;border-collapse:collapse;font-size:.8rem">
+      <thead><tr>
+        <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:5px 10px;text-align:left;border-bottom:1px solid var(--bor)">Periodo</th>
+        <th style="font-family:var(--mo);font-size:.57rem;color:#7b2ff7;padding:5px 10px;text-align:right;border-bottom:1px solid var(--bor)">Ana</th>
+        <th style="font-family:var(--mo);font-size:.57rem;color:#e8529a;padding:5px 10px;text-align:right;border-bottom:1px solid var(--bor)">Leticia</th>
+        <th style="font-family:var(--mo);font-size:.57rem;color:#5b1fa6;padding:5px 10px;text-align:right;border-bottom:1px solid var(--bor)">Total</th>
+      </tr></thead>
+      <tbody>
+        ${invProj.map(d=>`<tr>
+          <td style="padding:6px 10px;border-bottom:1px solid var(--bor);font-weight:600">${d.l}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);color:#7b2ff7">${fmt(d.ana)}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);color:#e8529a">${fmt(d.let)}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);color:#5b1fa6;font-weight:600">${fmt(d.tot)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- ACCORDIONS POR MES -->
+  <div style="font-size:.87rem;font-weight:700;margin-bottom:10px">Detalhamento mensal — Ana</div>
+  ${meses12.map(m=>{
+    const rec=gS(m).reduce((s,x)=>s+pv(x.valor),0);
+    const div=gD(m).reduce((s,x)=>s+pv(x.valor),0)+S.installments.filter(it=>{const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;return mi(m)>=mi(ms)&&mi(m)<=mi(addM(ms,it.tp-1));}).reduce((s,i)=>s+i.vp,0);
+    const sal=rec-div;const inv=(S.aportes||[]).filter(a=>a.m===m).reduce((s,a)=>s+a.v,0);
+    const isCur=m===S.activeMonth;const id='anual-a-'+m.replace(' ','-');
+    return`<div class="mah${isCur?' open':''}" id="${id}">
+      <div class="mhh" onclick="document.getElementById('${id}').classList.toggle('open')">
+        <span class="mha">&#9654;</span>
+        <span style="font-weight:700;font-size:.85rem;flex:1;color:${isCur?'#7b2ff7':'var(--tx)'}">${m}${isCur?' ← atual':''}</span>
+        <span style="font-family:var(--mo);font-size:.69rem;color:${sal>=0?'var(--g)':'var(--r)'}">${fmt(sal)}</span>
+      </div>
+      <div class="mhb">
+        <div class="ar"><span class="ak">Receitas</span><span class="av cg">${fmt(rec)}</span></div>
+        <div class="ar"><span class="ak">Dividas</span><span class="av cr">${fmt(div)}</span></div>
+        <div class="ar"><span class="ak">Saldo</span><span class="av" style="color:${sal>=0?'var(--g)':'var(--r)'}">${fmt(sal)}</span></div>
+        <div class="ar"><span class="ak">Investido</span><span class="av" style="color:#7b2ff7">${fmt(inv)}</span></div>
+      </div>
+    </div>`;
+  }).join('')}`;
+}
+
+// ── STUB: new sections ──
+function buildRelTable(rel){
+  if(!rel.length)return '<div style="font-size:.81rem;color:var(--mu);font-style:italic">Nenhum item cadastrado ainda.</div>';
+  let rows='';
+  rel.forEach(r=>{
+    const ganho=(r.valorEst||0)-(r.valorPago||0);
+    const stBg=r.status==='vendido'?'var(--gl)':r.status==='reservado'?'var(--wl)':'#f0d6f8';
+    const stCo=r.status==='vendido'?'var(--g)':r.status==='reservado'?'var(--w)':'#7b2ff7';
+    const rowBg=r.status==='vendido'?'background:#f0fff4;':'';
+    rows+=`<tr style="${rowBg}">
+      <td style="padding:8px 10px;border-bottom:1px solid var(--bor);font-weight:600">${r.nome}<div style="font-family:var(--mo);font-size:.63rem;color:var(--mu)">${r.desc||''}</div></td>
+      <td style="padding:8px 10px;border-bottom:1px solid var(--bor)"><span class="pill pill-p" style="font-size:.6rem">${r.cat||'Outro'}</span></td>
+      <td style="padding:8px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo)">${fmt(r.valorPago||0)}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);color:${ganho>=0?'var(--g)':'var(--r)'}">
+        ${fmt(r.valorEst||0)}${ganho!==0?' ('+(ganho>=0?'+':'')+fmt(ganho)+')':''}
+      </td>
+      <td style="padding:8px 10px;border-bottom:1px solid var(--bor)">
+        <select style="background:${stBg};color:${stCo};border:none;font-family:var(--mo);font-size:.63rem;padding:3px 6px;border-radius:20px;cursor:pointer"
+          onchange="const it=S.reliquias.itens.find(x=>x.id==='${r.id}');if(it){it.status=this.value;saveAll();renderEmpAna();}">
+          <option value="colecao" ${r.status==='colecao'?'selected':''}>Na colecao</option>
+          <option value="reservado" ${r.status==='reservado'?'selected':''}>Reservado</option>
+          <option value="vendido" ${r.status==='vendido'?'selected':''}>Vendido</option>
+        </select>
+      </td>
+      <td style="padding:8px 10px;border-bottom:1px solid var(--bor)">
+        <button class="db" onclick="S.reliquias.itens=S.reliquias.itens.filter(x=>x.id!=='${r.id}');saveAll();renderEmpAna()">x</button>
+      </td>
+    </tr>`;
+  });
+  return `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.83rem">
+    <thead><tr>
+      <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;border-bottom:1px solid var(--bor)">Item</th>
+      <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;border-bottom:1px solid var(--bor)">Cat.</th>
+      <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Pago</th>
+      <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Est. atual</th>
+      <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;border-bottom:1px solid var(--bor)">Status</th>
+      <th style="width:24px;border-bottom:1px solid var(--bor)"></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function renderEmpAna(){
+  const e=document.getElementById('eana-cnt');if(!e)return;
+  if(!S.reliquias)S.reliquias={itens:[]};
+  const rel=S.reliquias.itens||[];
+  const relVal=rel.reduce((s,r)=>s+(r.valorEst||r.valor||0),0);
+  const relVend=rel.filter(r=>r.status==='vendido').reduce((s,r)=>s+(r.valorEst||r.valor||0),0);
+  e.innerHTML=`<div class="sec-header"><div>
+    <div class="sec-name" style="background:linear-gradient(90deg,#5b1fa6,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Empreendimentos — Ana</div>
+    <div class="sec-sub">VITDSGN e Reliquias Colecionaveis</div></div></div>
+  <div style="display:flex;gap:8px;margin-bottom:16px">
+    <button id="emp-tab-vit" class="btn bp" style="font-size:.78rem" onclick="empAnaTab('vit')">VITDSGN</button>
+    <button id="emp-tab-rel" class="btn bo" style="font-size:.78rem" onclick="empAnaTab('rel')">Reliquias Colecionaveis</button>
+  </div>
+  <div id="eana-vit"><div id="vitdsgn-cnt"></div></div>
+  <div id="eana-rel" style="display:none">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+      <div class="kpi accent"><div class="kpi-l">Total itens</div><div class="kpi-v">${rel.length}</div></div>
+      <div class="kpi"><div class="kpi-l">Valor estimado</div><div class="kpi-v" style="color:#7b2ff7">${fmt(relVal)}</div></div>
+      <div class="kpi"><div class="kpi-l">Vendidos</div><div class="kpi-v" style="color:var(--g)">${fmt(relVend)}</div></div>
+    </div>
+    <div class="panel">
+      ${buildRelTable(rel)}
+    </div>
+  </div>`;
+  renderVitdsgn();
+  renderVitdsgn();
+}
+function empAnaTab(tab){
+  const v=document.getElementById('eana-vit'),r=document.getElementById('eana-rel');
+  if(v)v.style.display=tab==='vit'?'block':'none';
+  if(r)r.style.display=tab==='rel'?'block':'none';
+  const bv=document.getElementById('emp-tab-vit'),br=document.getElementById('emp-tab-rel');
+  if(bv)bv.className='btn '+(tab==='vit'?'bp':'bo');
+  if(br)br.className='btn '+(tab==='rel'?'bp':'bo');
+  if(tab==='vit')renderVitdsgn();
+}
+function relOpen(){
+  if(!S.reliquias)S.reliquias={itens:[]};
+  const o=document.createElement('div');o.className='mo open';
+  o.onclick=ev=>{if(ev.target===o)document.body.removeChild(o);};
+  o.innerHTML=`<div class="md"><h3>Novo item — Reliquias</h3>
+    <div class="fr"><label class="fl">Nome</label><input class="fi3" id="rel-n" placeholder="Ex: Funko Pop, Card..."></div>
+    <div class="fr"><label class="fl">Descricao</label><input class="fi3" id="rel-d" placeholder="Edicao, raridade, estado..."></div>
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Categoria</label><select class="fi3" id="rel-cat"><option>Funko Pop</option><option>Card/TCG</option><option>Figura</option><option>Quadrinho</option><option>Vintage</option><option>Arte</option><option>Outro</option></select></div>
+      <div class="fr" style="margin:0"><label class="fl">Valor pago (R$)</label><input class="fi3" id="rel-vp" type="number" step="0.01"></div>
+    </div>
+    <div class="fr" style="margin-top:10px"><label class="fl">Valor estimado atual (R$)</label><input class="fi3" id="rel-ve" type="number" step="0.01"></div>
+    <div class="ma"><button class="btn bo" onclick="this.closest('.mo').remove()">Cancelar</button>
+    <button class="btn bp" onclick="const n=document.getElementById('rel-n').value.trim(),d=document.getElementById('rel-d').value.trim(),cat=document.getElementById('rel-cat').value,vp=parseFloat(document.getElementById('rel-vp').value)||0,ve=parseFloat(document.getElementById('rel-ve').value)||vp;if(!n){toast('Preencha o nome',true);return;}S.reliquias.itens.push({id:uid(),nome:n,desc:d,cat,valorPago:vp,valorEst:ve,status:'colecao'});saveAll();this.closest('.mo').remove();renderEmpAna();toast('Item adicionado!');">Salvar</button>
+    </div></div>`;
+  document.body.appendChild(o);o.querySelector('input').focus();
+}
+
+
+function renderMetasLet(){
+  const e=document.getElementById('mlet-cnt');if(!e)return;
+  const L=gLet();if(!L.metas)L.metas=[];
+  const tiv=L.aportes.reduce((s,a)=>s+a.v,0);
+  const CATS=[
+    {key:'financeira',label:'Financeiras',cor:'#c0407a'},
+    {key:'pessoal',label:'Pessoais',cor:'#7b2ff7'},
+    {key:'profissional',label:'Profissionais',cor:'var(--g)'},
+  ];
+  e.innerHTML=`
+  <div class="sec-header">
+    <div><div class="sec-name" style="background:linear-gradient(90deg,#c0407a,#e8529a);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Metas — Leticia</div>
+    <div class="sec-sub">Objetivos pessoais, financeiros e profissionais</div></div>
+    <button class="btn" style="font-size:.71rem;padding:5px 10px;background:linear-gradient(90deg,#c0407a,#e8529a);color:#fff;border:none" onclick="letOpenMeta()">+ Nova meta</button>
+  </div>
+  ${CATS.map(cat=>{
+    const its=(L.metas||[]).filter(m=>m.cat===cat.key||(!m.cat&&cat.key==='financeira'));
+    return`<div style="margin-bottom:22px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:4px;height:18px;background:${cat.cor};border-radius:2px"></div>
+        <h3 style="font-size:.87rem;font-weight:700;color:${cat.cor};margin:0">${cat.label}</h3>
+        <span style="font-family:var(--mo);font-size:.6rem;padding:2px 8px;border-radius:20px;background:${cat.cor}18;color:${cat.cor}">${its.length} meta${its.length!==1?'s':''}</span>
+        <button class="ab" style="margin-left:auto;font-size:.7rem" onclick="document.getElementById('lmtcat').value='${cat.key}';letOpenMeta()">+ Adicionar</button>
+      </div>
+      ${its.length===0?'<div style="font-size:.81rem;color:var(--mu);font-style:italic;padding:8px 0">Nenhuma meta ainda.</div>':
+      `<div style="display:flex;flex-direction:column;gap:8px">${its.map(m=>letMetaCard(m,tiv,cat)).join('')}</div>`}
+    </div>`;
+  }).join('')}`;
+}
+
+function letMetaCard(m,tiv,cat){
+  const isDin=m.tipo==='dinheiro'||!m.tipo;
+  const isPct=m.tipo==='percentual'||m.tipo==='habito';
+  const isLivre=m.tipo==='livre';
+  const atual=m.atual||0;
+  const alvo=m.alvo||100;
+  const pct=alvo>0?Math.min(100,Math.round(atual/alvo*100)):0;
+  const win=(!isLivre&&pct>=100)||(isLivre&&m.status==='concluida');
+  const cor=cat.cor;
+  if(win)return`<div style="background:linear-gradient(135deg,${cor}18,${cor}08);border:2px solid ${cor};border-radius:12px;padding:16px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;background:${cor};border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;flex-shrink:0">✓</div>
+      <div style="flex:1"><div style="font-weight:700">${m.nome}</div><div style="font-family:var(--mo);font-size:.63rem;color:${cor};font-weight:600">META CONQUISTADA!</div></div>
+      <button class="db" onclick="gLet().metas=gLet().metas.filter(x=>x.id!=='${m.id}');renderMetasLet()">x</button>
+    </div></div>`;
+  return`<div style="background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:14px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+      <div style="flex:1"><div style="font-weight:700;font-size:.88rem">${m.nome}</div>
+        ${m.nota?`<div style="font-size:.75rem;color:var(--mu);font-style:italic">"${m.nota}"</div>`:''}
+      </div>
+      <div style="text-align:right">
+        ${!isLivre?`<div style="font-family:var(--mo);font-size:1rem;font-weight:600;color:${cor}">${pct}%</div>`:''}
+        <button class="db" onclick="gLet().metas=gLet().metas.filter(x=>x.id!=='${m.id}');renderMetasLet()" style="font-size:.7rem;color:var(--mu)">excluir</button>
+      </div>
+    </div>
+    ${!isLivre?`<div style="height:6px;background:var(--bor);border-radius:99px;overflow:hidden;margin-bottom:6px"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${cor},${cor}88);border-radius:99px"></div></div>
+    <div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:.68rem;color:var(--mu)">
+      <span>${isDin?fmt(atual):atual}</span><span>Meta: ${isDin?fmt(alvo):alvo}</span>
+    </div>
+    ${isDin?`<div style="margin-top:8px;display:flex;gap:6px"><input id="lav-${m.id}" type="number" step="0.01" class="fi3" style="max-width:130px;padding:5px 8px;font-size:.75rem" placeholder="Adicionar..."><button class="btn" style="padding:5px 10px;font-size:.72rem;background:linear-gradient(90deg,#c0407a,#e8529a);color:#fff;border:none" onclick="const i=document.getElementById('lav-${m.id}');const v=parseFloat(i.value)||0;if(v){const mt=gLet().metas.find(x=>x.id==='${m.id}');if(mt){mt.atual=(mt.atual||0)+v;i.value='';saveAll();renderMetasLet();}}">+</button></div>`:''}`
+    :`<div style="font-size:.82rem;color:var(--mu)">${m.desc||''}</div>
+    <select class="fi3" style="margin-top:7px;width:auto;padding:3px 7px;font-size:.73rem" onchange="const mt=gLet().metas.find(x=>x.id==='${m.id}');if(mt){mt.status=this.value;saveAll();renderMetasLet();}">
+      <option value="em_andamento" ${(m.status||'em_andamento')==='em_andamento'?'selected':''}>Em andamento</option>
+      <option value="pausada" ${m.status==='pausada'?'selected':''}>Pausada</option>
+      <option value="concluida" ${m.status==='concluida'?'selected':''}>Concluida</option>
+    </select>`}
+  </div>`;
+}
+function letOpenMeta(){
+  if(!gLet().metas)gLet().metas=[];
+  showLetModal(`<div class="md"><h3>Nova meta — Leticia</h3>
+    <div class="fr"><label class="fl">Nome</label><input class="fi3" id="lmt-n" placeholder="Ex: Viagem, CNH, Reserva..."></div>
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Categoria</label><select class="fi3" id="lmtcat"><option value="financeira">Financeira</option><option value="pessoal">Pessoal</option><option value="profissional">Profissional</option></select></div>
+      <div class="fr" style="margin:0"><label class="fl">Tipo</label><select class="fi3" id="lmt-t"><option value="dinheiro">Dinheiro (R$)</option><option value="percentual">Percentual</option><option value="habito">Habito</option><option value="livre">Livre</option></select></div>
+    </div>
+    <div class="fr2" style="margin-top:10px">
+      <div class="fr" style="margin:0"><label class="fl">Meta (valor)</label><input class="fi3" id="lmt-a" type="number" step="0.01" placeholder="0"></div>
+      <div class="fr" style="margin:0"><label class="fl">Atual</label><input class="fi3" id="lmt-c" type="number" step="0.01" placeholder="0"></div>
+    </div>
+    <div class="fr" style="margin-top:10px"><label class="fl">Descricao</label><input class="fi3" id="lmt-d" placeholder="Detalhes..."></div>
+    <div class="fr"><label class="fl">Prazo</label><input class="fi3" id="lmt-p" type="month"></div>
+    <div class="fr"><label class="fl">Motivacao</label><input class="fi3" id="lmt-nota" placeholder="Por que essa meta importa?"></div>
+    <div class="ma"><button class="btn bo" onclick="cm('let-modal')">Cancelar</button>
+    <button class="btn" style="background:linear-gradient(90deg,#c0407a,#e8529a);color:#fff;border:none;padding:7px 14px;border-radius:7px;font-size:.8rem;font-weight:700;cursor:pointer" onclick="const n=document.getElementById('lmt-n').value.trim(),cat=document.getElementById('lmtcat').value,t=document.getElementById('lmt-t').value,a=parseFloat(document.getElementById('lmt-a').value)||0,c=parseFloat(document.getElementById('lmt-c').value)||0,d=document.getElementById('lmt-d').value.trim(),p=document.getElementById('lmt-p').value,nota=document.getElementById('lmt-nota').value.trim();if(!n){toast('Preencha o nome',true);return;}gLet().metas.push({id:uid(),nome:n,cat,tipo:t,alvo:a,atual:c,desc:d,prazo:p,nota});saveAll();cm('let-modal');renderMetasLet();toast('Meta criada');">Salvar</button>
+    </div>
+  </div>`);
+}
+
+function renderInvestLet(){
+  const e=document.getElementById('ilet-cnt');if(!e)return;
+  const L=gLet();const aps=L.aportes||[];const total=aps.reduce((s,a)=>s+a.v,0);
+  const ps=[{l:'3 meses',m:3},{l:'6 meses',m:6},{l:'1 ano',m:12},{l:'2 anos',m:24},{l:'5 anos',m:60}];
+  e.innerHTML=`
+  <div class="sec-header">
+    <div><div class="sec-name" style="background:linear-gradient(90deg,#c0407a,#e8529a);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Investimentos — Leticia</div>
+    <div class="sec-sub">Aportes, projecoes e rendimentos</div></div>
+    <button class="btn" style="background:linear-gradient(90deg,#c0407a,#e8529a);color:#fff;border:none;font-size:.72rem;padding:5px 10px;border-radius:7px;cursor:pointer" onclick="letOpenAp()">+ Aporte</button>
+  </div>
+  <div class="grid3" style="margin-bottom:20px">
+    <div class="kpi pink"><div class="kpi-l">Total investido</div><div class="kpi-v">${fmt(total)}</div><div class="kpi-s">${aps.length} aporte${aps.length!==1?'s':''}</div></div>
+    <div class="kpi"><div class="kpi-l">Rendimento estimado (1 ano)</div><div class="kpi-v" style="color:#c0407a">${fmt(projCompound(total,CDI_AA*1.05,12)-total)}</div><div class="kpi-s">105% CDI</div></div>
+    <div class="kpi"><div class="kpi-l">Projecao 5 anos</div><div class="kpi-v" style="color:#7b2ff7">${fmt(projCompound(total,CDI_AA*1.05,60))}</div></div>
+  </div>
+  ${aps.length>0?`
+  <div class="grid2" style="margin-bottom:16px">
+    <div class="panel">
+      <h3>Aportes registrados</h3>
+      ${aps.map(a=>`<div class="row-item"><div class="dot" style="background:#e8529a"></div><div style="flex:1"><div style="font-weight:600">${a.d}</div><div style="font-family:var(--mo);font-size:.64rem;color:var(--mu)">${a.m}</div></div><span style="font-family:var(--mo);font-size:.82rem;color:#c0407a;font-weight:600">+${fmt(a.v)}</span><button class="db" onclick="gLet().aportes=gLet().aportes.filter(x=>x.id!=='${a.id}');saveAll();renderInvestLet()">x</button></div>`).join('')}
+    </div>
+    <div class="panel">
+      <h3>Projecao por periodo</h3>
+      ${ps.map(p=>{const v=projCompound(total,CDI_AA*1.05,p.m),g=v-total;return`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bor)"><span style="font-size:.82rem">${p.l}</span><div style="text-align:right"><div style="font-family:var(--mo);font-size:.88rem;font-weight:600;color:#c0407a">${fmt(v)}</div><div style="font-family:var(--mo);font-size:.65rem;color:var(--mu)">+${fmt(g)}</div></div></div>`;}).join('')}
+    </div>
+  </div>`:'<div class="panel"><div style="font-size:.81rem;color:var(--mu);font-style:italic">Nenhum aporte registrado. Use o botao acima para comecar!</div></div>'}`;
+}
+
+function renderEmpLet(){
+  const e=document.getElementById('elet-cnt');if(!e)return;
+  if(!S.empLet)S.empLet={empresas:[],tarefas:[],ideias:[],receita_meta:0,metas_meses:{}};
+  const emp=S.empLet;
+  e.innerHTML=`
+  <div class="sec-header">
+    <div><div class="sec-name" style="background:linear-gradient(90deg,#c0407a,#e8529a);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Empreendimentos — Leticia</div>
+    <div class="sec-sub">Gestao das suas empresas e projetos</div></div>
+    <div style="display:flex;gap:7px">
+      <button class="btn" style="font-size:.71rem;padding:5px 10px;background:linear-gradient(90deg,#c0407a,#e8529a);color:#fff;border:none" onclick="letEmpOpenEmp()">+ Empresa</button>
+      <button class="btn" style="font-size:.71rem;padding:5px 10px;background:#fde8f3;color:#c0407a;border:none" onclick="letEmpOpenTarefa()">+ Tarefa</button>
+    </div>
+  </div>
+
+  ${(emp.empresas||[]).length===0?`<div class="panel" style="text-align:center;padding:40px">
+    <div style="font-size:1.5rem;margin-bottom:10px">🏢</div>
+    <div style="font-weight:700;margin-bottom:5px">Nenhuma empresa cadastrada</div>
+    <div style="font-size:.82rem;color:var(--mu);margin-bottom:16px">Adicione suas empresas e projetos para comecar a gerenciar.</div>
+    <button class="btn" style="background:linear-gradient(90deg,#c0407a,#e8529a);color:#fff;border:none;padding:8px 16px;border-radius:7px;cursor:pointer" onclick="letEmpOpenEmp()">+ Adicionar empresa</button>
+  </div>`
+  :(emp.empresas||[]).map(emp2=>{
+    const tarEmp=(emp.tarefas||[]).filter(t=>t.empId===emp2.id);
+    const recTotal=(emp2.receitas||[]).reduce((s,r)=>s+r.v,0);
+    const despTotal=(emp2.despesas||[]).reduce((s,d)=>s+d.v,0);
+    const result=recTotal-despTotal;
+    return`<div class="panel" style="margin-bottom:14px;border-left:4px solid #e8529a">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;color:#c0407a">${emp2.nome}</div>
+          <div style="font-size:.78rem;color:var(--mu)">${emp2.tipo||''} ${emp2.cnpj?'· CNPJ: '+emp2.cnpj:''}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <span class="pill ${result>=0?'pill-g':'pill-r'}">${result>=0?'+':'-'}${fmt(Math.abs(result))}</span>
+          <button class="db" onclick="S.empLet.empresas=S.empLet.empresas.filter(x=>x.id!=='${emp2.id}');saveAll();renderEmpLet()">x</button>
+        </div>
+      </div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div style="text-align:center;padding:10px;background:#fde8f3;border-radius:8px">
+          <div style="font-family:var(--mo);font-size:.58rem;color:#c0407a;text-transform:uppercase">Receitas</div>
+          <div style="font-family:var(--mo);font-size:.9rem;font-weight:600;color:var(--g)">${fmt(recTotal)}</div>
+        </div>
+        <div style="text-align:center;padding:10px;background:#fff5f5;border-radius:8px">
+          <div style="font-family:var(--mo);font-size:.58rem;color:var(--r);text-transform:uppercase">Despesas</div>
+          <div style="font-family:var(--mo);font-size:.9rem;font-weight:600;color:var(--r)">${fmt(despTotal)}</div>
+        </div>
+        <div style="text-align:center;padding:10px;background:${result>=0?'#f0fff4':'#fff5f5'};border-radius:8px">
+          <div style="font-family:var(--mo);font-size:.58rem;color:${result>=0?'var(--g)':'var(--r)'};text-transform:uppercase">Resultado</div>
+          <div style="font-family:var(--mo);font-size:.9rem;font-weight:600;color:${result>=0?'var(--g)':'var(--r)'}">${fmt(result)}</div>
+        </div>
+      </div>
+      ${tarEmp.length>0?`<div style="font-family:var(--mo);font-size:.59rem;color:var(--mu);text-transform:uppercase;margin-bottom:7px">Tarefas</div>
+      ${tarEmp.map(t=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bor)">
+        <input type="checkbox" ${t.feita?'checked':''} style="accent-color:#c0407a" onchange="const tr=S.empLet.tarefas.find(x=>x.id==='${t.id}');if(tr){tr.feita=this.checked;saveAll();renderEmpLet();}">
+        <span style="flex:1;font-size:.82rem;${t.feita?'text-decoration:line-through;color:var(--mu)':''}">${t.texto}</span>
+        ${t.prioridade==='alta'?'<span class="pill pill-r" style="font-size:.58rem">urgente</span>':''}
+        <button class="db" onclick="S.empLet.tarefas=S.empLet.tarefas.filter(x=>x.id!=='${t.id}');saveAll();renderEmpLet()">x</button>
+      </div>`).join('')}`:''}
+      <div style="margin-top:10px;display:flex;gap:7px">
+        <button class="ab" onclick="letEmpAddReceita('${emp2.id}')">+ Receita</button>
+        <button class="ab" onclick="letEmpAddDespesa('${emp2.id}')">+ Despesa</button>
+        <button class="ab" onclick="letEmpAddTarefa('${emp2.id}')">+ Tarefa</button>
+      </div>
+    </div>`;
+  }).join('')}
+
+  <!-- BANCO DE IDEIAS -->
+  <div class="panel" style="margin-bottom:14px">
+    <h3>Banco de ideias <button onclick="letEmpAddIdeia()">+ Add</button></h3>
+    ${(emp.ideias||[]).length===0?'<div style="font-size:.81rem;color:var(--mu);font-style:italic">Capture suas ideias de negocio aqui.</div>':
+    `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+      ${(emp.ideias||[]).map(i=>`<div style="background:#fde8f3;border:1px solid #f0c8e0;border-radius:9px;padding:12px">
+        <div style="font-weight:600;font-size:.83rem;margin-bottom:3px">${i.titulo}</div>
+        <div style="font-size:.78rem;color:var(--mu)">${i.desc||''}</div>
+        <button class="db" onclick="S.empLet.ideias=S.empLet.ideias.filter(x=>x.id!=='${i.id}');saveAll();renderEmpLet()">x</button>
+      </div>`).join('')}
+    </div>`}
+  </div>`;
+}
+
+function letEmpOpenEmp(){
+  if(!S.empLet)S.empLet={empresas:[],tarefas:[],ideias:[]};
+  showLetModal(`<div class="md"><h3>Nova empresa — Leticia</h3>
+    <div class="fr"><label class="fl">Nome da empresa</label><input class="fi3" id="le-n" placeholder="Ex: Studio L, Consultoria..."></div>
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Tipo</label><select class="fi3" id="le-t"><option>MEI</option><option>ME</option><option>Freelancer</option><option>Projeto</option><option>Startup</option><option>Outro</option></select></div>
+      <div class="fr" style="margin:0"><label class="fl">CNPJ (opcional)</label><input class="fi3" id="le-cnpj" placeholder="XX.XXX.XXX/XXXX-XX"></div>
+    </div>
+    <div class="fr" style="margin-top:10px"><label class="fl">Descricao</label><input class="fi3" id="le-d" placeholder="O que faz essa empresa?"></div>
+    <div class="ma"><button class="btn bo" onclick="cm('let-modal')">Cancelar</button>
+    <button class="btn" style="background:linear-gradient(90deg,#c0407a,#e8529a);color:#fff;border:none;padding:7px 14px;border-radius:7px;cursor:pointer" onclick="const n=document.getElementById('le-n').value.trim(),t=document.getElementById('le-t').value,cnpj=document.getElementById('le-cnpj').value.trim(),d=document.getElementById('le-d').value.trim();if(!n){toast('Preencha o nome',true);return;}S.empLet.empresas.push({id:uid(),nome:n,tipo:t,cnpj,desc:d,receitas:[],despesas:[]});saveAll();cm('let-modal');renderEmpLet();toast('Empresa adicionada');">Salvar</button>
+    </div>
+  </div>`);
+}
+function letEmpAddReceita(id){
+  showLetModal(`<div class="md"><h3>Receita da empresa</h3>
+    <div class="fr"><label class="fl">Descricao</label><input class="fi3" id="ler-d" placeholder="Ex: Servico, Venda..."></div>
+    <div class="fr"><label class="fl">Valor (R$)</label><input class="fi3" id="ler-v" type="number" step="0.01"></div>
+    <div class="ma"><button class="btn bo" onclick="cm('let-modal')">Cancelar</button>
+    <button class="btn" style="background:var(--g);color:#fff;border:none;padding:7px 14px;border-radius:7px;cursor:pointer" onclick="const d=document.getElementById('ler-d').value.trim(),v=parseFloat(document.getElementById('ler-v').value)||0;if(!d||!v){toast('Preencha os campos',true);return;}const emp2=S.empLet.empresas.find(x=>x.id==='${id}');if(emp2){if(!emp2.receitas)emp2.receitas=[];emp2.receitas.push({id:uid(),desc:d,v,data:new Date().toISOString().slice(0,10)});}saveAll();cm('let-modal');renderEmpLet();toast('Receita adicionada');">Salvar</button>
+    </div></div>`);
+}
+function letEmpAddDespesa(id){
+  showLetModal(`<div class="md"><h3>Despesa da empresa</h3>
+    <div class="fr"><label class="fl">Descricao</label><input class="fi3" id="led-d" placeholder="Ex: Ferramenta, Material..."></div>
+    <div class="fr"><label class="fl">Valor (R$)</label><input class="fi3" id="led-v" type="number" step="0.01"></div>
+    <div class="ma"><button class="btn bo" onclick="cm('let-modal')">Cancelar</button>
+    <button class="btn" style="background:var(--r);color:#fff;border:none;padding:7px 14px;border-radius:7px;cursor:pointer" onclick="const d=document.getElementById('led-d').value.trim(),v=parseFloat(document.getElementById('led-v').value)||0;if(!d||!v){toast('Preencha os campos',true);return;}const emp2=S.empLet.empresas.find(x=>x.id==='${id}');if(emp2){if(!emp2.despesas)emp2.despesas=[];emp2.despesas.push({id:uid(),desc:d,v,data:new Date().toISOString().slice(0,10)});}saveAll();cm('let-modal');renderEmpLet();toast('Despesa adicionada');">Salvar</button>
+    </div></div>`);
+}
+function letEmpAddTarefa(empId){
+  showLetModal(`<div class="md"><h3>Tarefa da empresa</h3>
+    <div class="fr"><label class="fl">Tarefa</label><input class="fi3" id="let2-d" placeholder="O que precisa ser feito?"></div>
+    <div class="fr"><label class="fl">Prioridade</label><select class="fi3" id="let2-p"><option value="normal">Normal</option><option value="alta">Urgente</option></select></div>
+    <div class="ma"><button class="btn bo" onclick="cm('let-modal')">Cancelar</button>
+    <button class="btn" style="background:linear-gradient(90deg,#c0407a,#e8529a);color:#fff;border:none;padding:7px 14px;border-radius:7px;cursor:pointer" onclick="const d=document.getElementById('let2-d').value.trim(),p=document.getElementById('let2-p').value;if(!d){toast('Preencha a tarefa',true);return;}if(!S.empLet.tarefas)S.empLet.tarefas=[];S.empLet.tarefas.push({id:uid(),texto:d,prioridade:p,empId:'${empId}',feita:false});saveAll();cm('let-modal');renderEmpLet();toast('Tarefa adicionada');">Salvar</button>
+    </div></div>`);
+}
+function letEmpOpenTarefa(){letEmpAddTarefa('');}
+function letEmpAddIdeia(){
+  showLetModal(`<div class="md"><h3>Ideia de negocio</h3>
+    <div class="fr"><label class="fl">Titulo</label><input class="fi3" id="lei-t" placeholder="Ex: Criar app, Parceria com..."></div>
+    <div class="fr"><label class="fl">Descricao</label><input class="fi3" id="lei-d" placeholder="Desenvolva a ideia..."></div>
+    <div class="ma"><button class="btn bo" onclick="cm('let-modal')">Cancelar</button>
+    <button class="btn" style="background:linear-gradient(90deg,#c0407a,#e8529a);color:#fff;border:none;padding:7px 14px;border-radius:7px;cursor:pointer" onclick="const t=document.getElementById('lei-t').value.trim(),d=document.getElementById('lei-d').value.trim();if(!t){toast('Preencha o titulo',true);return;}if(!S.empLet.ideias)S.empLet.ideias=[];S.empLet.ideias.push({id:uid(),titulo:t,desc:d});saveAll();cm('let-modal');renderEmpLet();toast('Ideia salva');">Salvar</button>
+    </div></div>`);
+}
+
+function renderInvestConj(){
+  const e=document.getElementById('iconj-cnt');if(!e)return;
+  const C=gCasal();const aps=C.aportes||[];
+  const anaInv=(S.aportes||[]).reduce((s,a)=>s+a.v,0);
+  const letInv=gLet().aportes.reduce((s,a)=>s+a.v,0);
+  const conjInv=aps.reduce((s,a)=>s+a.v,0);
+  const total=anaInv+letInv+conjInv;
+  const ps=[{l:'6 meses',m:6},{l:'1 ano',m:12},{l:'2 anos',m:24},{l:'5 anos',m:60},{l:'10 anos',m:120}];
+  e.innerHTML=`
+  <div class="sec-header">
+    <div><div class="sec-name" style="background:linear-gradient(90deg,#7b2ff7,#e8529a);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Investimentos Conjuntos</div>
+    <div class="sec-sub">Gestao e projecao dos investimentos a duas</div></div>
+    <button class="btn bp" style="font-size:.71rem;padding:5px 10px" onclick="casalOpenAp()">+ Aporte conjunto</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
+    <div class="kpi accent"><div class="kpi-l">Ana investiu</div><div class="kpi-v">${fmt(anaInv)}</div><div class="kpi-s">${(S.aportes||[]).length} aportes</div></div>
+    <div class="kpi pink"><div class="kpi-l">Leticia investiu</div><div class="kpi-v">${fmt(letInv)}</div><div class="kpi-s">${gLet().aportes.length} aportes</div></div>
+    <div class="kpi"><div class="kpi-l">Investimento conjunto</div><div class="kpi-v" style="color:#5b1fa6">${fmt(conjInv)}</div><div class="kpi-s">${aps.length} aportes</div></div>
+  </div>
+
+  <!-- TOTAL + PROJECAO -->
+  <div class="panel" style="margin-bottom:16px">
+    <h3>Patrimônio total e projecao</h3>
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-family:var(--mo);font-size:.6rem;color:var(--mu);text-transform:uppercase;margin-bottom:6px">Patrimônio total investido</div>
+      <div style="font-family:var(--mo);font-size:2rem;font-weight:600;background:linear-gradient(90deg,#7b2ff7,#e8529a);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${fmt(total)}</div>
+    </div>
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+      <thead><tr>
+        <th style="font-family:var(--mo);font-size:.58rem;color:var(--mu);padding:6px 10px;text-align:left;border-bottom:1px solid var(--bor)">Periodo</th>
+        <th style="font-family:var(--mo);font-size:.58rem;color:#7b2ff7;padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Ana</th>
+        <th style="font-family:var(--mo);font-size:.58rem;color:#e8529a;padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Leticia</th>
+        <th style="font-family:var(--mo);font-size:.58rem;color:#5b1fa6;padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Total</th>
+      </tr></thead>
+      <tbody>
+        ${ps.map(p=>{const a=projCompound(anaInv+conjInv/2,CDI_AA*1.05,p.m),l=projCompound(letInv+conjInv/2,CDI_AA*1.05,p.m),t2=a+l;return`<tr>
+          <td style="padding:7px 10px;border-bottom:1px solid var(--bor);font-weight:600">${p.l}</td>
+          <td style="padding:7px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);color:#7b2ff7">${fmt(a)}</td>
+          <td style="padding:7px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);color:#e8529a">${fmt(l)}</td>
+          <td style="padding:7px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);font-weight:700;color:#5b1fa6">${fmt(t2)}</td>
+        </tr>`;}).join('')}
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- APORTES CONJUNTOS -->
+  <div class="panel">
+    <h3>Caixinha conjunta <button onclick="casalOpenAp()">+ Add</button></h3>
+    ${aps.length===0?'<div style="font-size:.81rem;color:var(--mu);font-style:italic">Nenhum aporte conjunto ainda.</div>':
+    aps.map(a=>`<div class="row-item">
+      <div class="dot" style="background:linear-gradient(135deg,#7b2ff7,#e8529a)"></div>
+      <div style="flex:1"><div style="font-weight:600">${a.d}</div><div style="font-family:var(--mo);font-size:.63rem;color:var(--mu)">${a.m||''} · Ana: ${fmt(a.ana||0)} · Let: ${fmt(a.let||0)}</div></div>
+      <span style="font-family:var(--mo);font-size:.82rem;font-weight:600;color:#5b1fa6">+${fmt(a.v)}</span>
+      <button class="db" onclick="gCasal().aportes=gCasal().aportes.filter(x=>x.id!=='${a.id}');saveAll();renderInvestConj()">x</button>
+    </div>`).join('')}
+  </div>`;
+}
+
+function renderMetasConj(){
+  const e=document.getElementById('mconj-cnt');if(!e)return;
+  const C=gCasal();const mts=C.metas||[];const tiv=(C.aportes||[]).reduce((s,a)=>s+a.v,0);
+  e.innerHTML=`
+  <div class="sec-header">
+    <div><div class="sec-name" style="background:linear-gradient(90deg,#7b2ff7,#e8529a);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Metas Conjuntas</div>
+    <div class="sec-sub">Objetivos e sonhos das duas juntas</div></div>
+    <button class="btn" style="background:linear-gradient(90deg,#7b2ff7,#e8529a);color:#fff;border:none;font-size:.72rem;padding:5px 10px;border-radius:7px;cursor:pointer" onclick="casalOpenMeta()">+ Nova meta</button>
+  </div>
+  ${mts.length===0?`<div style="text-align:center;padding:48px 24px;background:linear-gradient(135deg,#f5eeff,#fff0f8);border:1px solid #e0c8f8;border-radius:14px">
+    <div style="font-size:1.4rem;margin-bottom:10px">✦</div>
+    <div style="font-weight:700;font-size:.95rem;margin-bottom:6px">Nenhuma meta conjunta ainda</div>
+    <div style="font-size:.83rem;color:var(--mu);margin-bottom:18px">Criem seus objetivos a duas — viagens, imovel, investimentos...</div>
+    <button class="btn" style="background:linear-gradient(90deg,#7b2ff7,#e8529a);color:#fff;border:none;padding:8px 18px;border-radius:7px;cursor:pointer" onclick="casalOpenMeta()">+ Criar primeira meta</button>
+  </div>`:`
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
+    ${mts.map(m=>{
+      const pct2=m.alvo>0?Math.min(100,Math.round((m.atual||0)/m.alvo*100)):0;
+      const win=(!isLivre2(m)&&pct2>=100)||(isLivre2(m)&&m.status==='concluida');
+      function isLivre2(x){return x.tipo==='livre';}
+      const isDin2=m.tipo==='dinheiro'||!m.tipo;
+      const fl=Math.max(0,m.alvo-(m.atual||0));
+      if(win)return`<div style="background:linear-gradient(135deg,#f5eeff,#fff0f8);border:2px solid #a020c8;border-radius:14px;padding:18px">
+        <div style="font-family:var(--mo);font-size:.6rem;background:linear-gradient(90deg,#7b2ff7,#e8529a);color:#fff;padding:2px 10px;border-radius:20px;display:inline-block;margin-bottom:8px">Conquistada!</div>
+        <div style="font-weight:700;font-size:.92rem">${m.nome}</div>
+        ${m.nota?`<div style="font-size:.77rem;color:var(--mu);font-style:italic;margin-top:4px">"${m.nota}"</div>`:''}
+        <button class="db" onclick="gCasal().metas=gCasal().metas.filter(x=>x.id!=='${m.id}');saveAll();renderMetasConj()" style="margin-top:8px;font-size:.7rem;color:var(--mu)">excluir</button>
+      </div>`;
+      return`<div style="background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:.9rem;margin-bottom:3px">${m.nome}</div>
+            ${m.nota?`<div style="font-size:.76rem;color:var(--mu);font-style:italic">"${m.nota}"</div>`:''}
+          </div>
+          <div style="text-align:right;margin-left:10px">
+            ${!isLivre2(m)?`<div style="font-family:var(--mo);font-size:1.1rem;font-weight:600;background:linear-gradient(90deg,#7b2ff7,#e8529a);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${pct2}%</div>`:''}
+            <button class="db" onclick="gCasal().metas=gCasal().metas.filter(x=>x.id!=='${m.id}');saveAll();renderMetasConj()" style="font-size:.7rem;color:var(--mu)">excluir</button>
+          </div>
+        </div>
+        ${!isLivre2(m)?`
+        <div style="height:8px;background:var(--bor);border-radius:99px;overflow:hidden;margin-bottom:6px">
+          <div style="height:100%;width:${pct2}%;background:linear-gradient(90deg,#7b2ff7,#e8529a);border-radius:99px;transition:width .5s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:.69rem;color:var(--mu);margin-bottom:8px">
+          <span>${isDin2?fmt(m.atual||0):m.atual||0} ${isDin2?'guardados':'de '+(m.alvo||0)}</span>
+          <span>Meta: ${isDin2?fmt(m.alvo):m.alvo}</span>
+        </div>
+        ${fl>0?`<div style="font-family:var(--mo);font-size:.68rem;color:var(--mu);margin-bottom:8px">Falta ${isDin2?fmt(fl):fl}${m.prazo?' · prazo: '+m.prazo.split('-').reverse().slice(0,2).join('/'):''}${m.tipo==='investimento'?' · baseado nos aportes':''}</div>`:''}
+        ${isDin2?`<div style="display:flex;gap:6px"><input id="cmc-${m.id}" type="number" step="0.01" class="fi3" style="padding:4px 8px;font-size:.73rem" placeholder="Adicionar..."><button class="btn" style="padding:4px 10px;font-size:.7rem;background:linear-gradient(90deg,#7b2ff7,#e8529a);color:#fff;border:none;border-radius:6px;cursor:pointer" onclick="const i=document.getElementById('cmc-${m.id}');const v=parseFloat(i.value)||0;if(v){const mt=gCasal().metas.find(x=>x.id==='${m.id}');if(mt){mt.atual=(mt.atual||0)+v;i.value='';saveAll();renderMetasConj();}}">+</button></div>`:''}
+        `:`<div style="font-size:.81rem;color:var(--mu);margin-bottom:8px">${m.desc||''}</div>
+        <select class="fi3" style="width:auto;padding:3px 7px;font-size:.73rem" onchange="const mt=gCasal().metas.find(x=>x.id==='${m.id}');if(mt){mt.status=this.value;saveAll();renderMetasConj();}">
+          <option value="andamento" ${(m.status||'andamento')==='andamento'?'selected':''}>Em andamento</option>
+          <option value="concluida" ${m.status==='concluida'?'selected':''}>Concluida</option>
+        </select>`}
+        ${m.prazo?`<div style="font-family:var(--mo);font-size:.65rem;color:var(--mu);margin-top:6px">Prazo: ${m.prazo.split('-').reverse().slice(0,2).join('/')}</div>`:''}
+      </div>`;
+    }).join('')}
+  </div>`}`;
 }
 
 // ── METAS ──
@@ -1884,7 +2655,7 @@ function savMeta(){
 // ══════════════════════════════════════════════
 // LETICIA
 // ══════════════════════════════════════════════
-function gLet(){ if(!S.leticia) S.leticia={salarios:[],dividasFixas:[],installments:[],aportes:[],activeMonth:'Maio 2026'}; return S.leticia; }
+function gLet(){ if(!S.leticia) S.leticia={salarios:[],dividasFixas:[],installments:[],aportes:[],metas:[],activeMonth:'Maio 2026'}; if(!S.leticia.metas)S.leticia.metas=[]; return S.leticia; }
 
 function renderLeticia(){
   const e=document.getElementById('let-cnt'); if(!e) return;
