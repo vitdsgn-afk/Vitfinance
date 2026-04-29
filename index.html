@@ -717,9 +717,10 @@ function goVw(n,el){
   el?.classList.add('on');
   if(n==='vg')renderVG();
   if(n==='anual')renderAnual();
+  if(n==='main'){renderMNav();renderMC(S.activeMonth);renderFeed();renderAnaResumo();}
+  if(n==='metas')renderMetas();
   if(n==='invest')renderInvest();
-  if(n==='vitdsgn'){renderEmpAna();}
-  if(n==='emp-ana')renderEmpAna();
+  if(n==='vitdsgn'||n==='emp-ana')renderEmpAna();
   if(n==='leticia')renderLeticia();
   if(n==='metas-let')renderMetasLet();
   if(n==='invest-let')renderInvestLet();
@@ -1401,39 +1402,39 @@ function renderAnual(){
 
 // ── STUB: new sections ──
 function buildRelTable(rel){
-  if(!rel.length)return '<div style="font-size:.81rem;color:var(--mu);font-style:italic">Nenhum item cadastrado ainda.</div>';
+  if(!rel.length)return '<div style="font-size:.81rem;color:var(--mu);font-style:italic;padding:8px 0">Nenhum item cadastrado ainda. Adicione o que quer vender!</div>';
   let rows='';
   rel.forEach(r=>{
-    const ganho=(r.valorEst||0)-(r.valorPago||0);
-    const stBg=r.status==='vendido'?'var(--gl)':r.status==='reservado'?'var(--wl)':'#f0d6f8';
-    const stCo=r.status==='vendido'?'var(--g)':r.status==='reservado'?'var(--w)':'#7b2ff7';
-    const rowBg=r.status==='vendido'?'background:#f0fff4;':'';
-    rows+=`<tr style="${rowBg}">
-      <td style="padding:8px 10px;border-bottom:1px solid var(--bor);font-weight:600">${r.nome}<div style="font-family:var(--mo);font-size:.63rem;color:var(--mu)">${r.desc||''}</div></td>
+    const lucro=(r.valorVenda||0)-(r.valorPago||0);
+    const stMap={disponivel:{bg:'#f0d6f8',c:'#7b2ff7',l:'Disponivel'},reservado:{bg:'var(--wl)',c:'var(--w)',l:'Reservado'},vendido:{bg:'var(--gl)',c:'var(--g)',l:'Vendido'},nao_vendido:{bg:'#f0ede7',c:'var(--mu)',l:'Nao vendido'}};
+    const st=stMap[r.status||'disponivel']||stMap['disponivel'];
+    rows+=`<tr style="${r.status==='vendido'?'background:#f0fff4;':''}">
+      <td style="padding:8px 10px;border-bottom:1px solid var(--bor);font-weight:600">${r.nome}<div style="font-family:var(--mo);font-size:.63rem;color:var(--mu)">${r.desc||''} ${r.plataforma?'· '+r.plataforma:''}</div></td>
       <td style="padding:8px 10px;border-bottom:1px solid var(--bor)"><span class="pill pill-p" style="font-size:.6rem">${r.cat||'Outro'}</span></td>
       <td style="padding:8px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo)">${fmt(r.valorPago||0)}</td>
-      <td style="padding:8px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);color:${ganho>=0?'var(--g)':'var(--r)'}">
-        ${fmt(r.valorEst||0)}${ganho!==0?' ('+(ganho>=0?'+':'')+fmt(ganho)+')':''}
-      </td>
+      <td style="padding:8px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);font-weight:500;color:#7b2ff7">${r.valorAnuncio?fmt(r.valorAnuncio):'—'}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);font-weight:600;color:${r.status==='vendido'?(lucro>=0?'var(--g)':'var(--r)'):'var(--mu)'}">${r.status==='vendido'?fmt(r.valorVenda||0):'—'}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);font-size:.8rem;color:${lucro>=0?'var(--g)':'var(--r)'};font-weight:600">${r.status==='vendido'?(lucro>=0?'+':'')+fmt(lucro):'—'}</td>
       <td style="padding:8px 10px;border-bottom:1px solid var(--bor)">
-        <select style="background:${stBg};color:${stCo};border:none;font-family:var(--mo);font-size:.63rem;padding:3px 6px;border-radius:20px;cursor:pointer"
+        <select style="background:${st.bg};color:${st.c};border:none;font-family:var(--mo);font-size:.63rem;padding:3px 6px;border-radius:20px;cursor:pointer;font-weight:600"
           onchange="const it=S.reliquias.itens.find(x=>x.id==='${r.id}');if(it){it.status=this.value;saveAll();renderEmpAna();}">
-          <option value="colecao" ${r.status==='colecao'?'selected':''}>Na colecao</option>
+          <option value="disponivel" ${(r.status||'disponivel')==='disponivel'?'selected':''}>Disponivel</option>
           <option value="reservado" ${r.status==='reservado'?'selected':''}>Reservado</option>
           <option value="vendido" ${r.status==='vendido'?'selected':''}>Vendido</option>
+          <option value="nao_vendido" ${r.status==='nao_vendido'?'selected':''}>Nao vendido</option>
         </select>
       </td>
-      <td style="padding:8px 10px;border-bottom:1px solid var(--bor)">
-        <button class="db" onclick="S.reliquias.itens=S.reliquias.itens.filter(x=>x.id!=='${r.id}');saveAll();renderEmpAna()">x</button>
-      </td>
+      <td style="padding:8px 10px;border-bottom:1px solid var(--bor)"><button class="db" onclick="S.reliquias.itens=S.reliquias.itens.filter(x=>x.id!=='${r.id}');saveAll();renderEmpAna()">x</button></td>
     </tr>`;
   });
   return `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.83rem">
     <thead><tr>
       <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;border-bottom:1px solid var(--bor)">Item</th>
       <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;border-bottom:1px solid var(--bor)">Cat.</th>
-      <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Pago</th>
-      <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Est. atual</th>
+      <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Valor pago</th>
+      <th style="font-family:var(--mo);font-size:.57rem;color:#7b2ff7;padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Anuncio</th>
+      <th style="font-family:var(--mo);font-size:.57rem;color:var(--g);padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Venda</th>
+      <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Lucro</th>
       <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;border-bottom:1px solid var(--bor)">Status</th>
       <th style="width:24px;border-bottom:1px solid var(--bor)"></th>
     </tr></thead>
@@ -1445,28 +1446,76 @@ function renderEmpAna(){
   const e=document.getElementById('eana-cnt');if(!e)return;
   if(!S.reliquias)S.reliquias={itens:[]};
   const rel=S.reliquias.itens||[];
-  const relVal=rel.reduce((s,r)=>s+(r.valorEst||r.valor||0),0);
-  const relVend=rel.filter(r=>r.status==='vendido').reduce((s,r)=>s+(r.valorEst||r.valor||0),0);
+  const relAnunc=rel.filter(r=>r.status!=='vendido').reduce((s,r)=>s+(r.valorAnuncio||0),0);
+  const relVend=rel.filter(r=>r.status==='vendido').reduce((s,r)=>s+(r.valorVenda||0),0);
+  const relLucro=rel.filter(r=>r.status==='vendido').reduce((s,r)=>s+((r.valorVenda||0)-(r.valorPago||0)),0);
+  const relDisp=rel.filter(r=>r.status==='disponivel').length;
+  const relRes=rel.filter(r=>r.status==='reservado').length;
   e.innerHTML=`<div class="sec-header"><div>
     <div class="sec-name" style="background:linear-gradient(90deg,#5b1fa6,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Empreendimentos — Ana</div>
     <div class="sec-sub">VITDSGN e Reliquias Colecionaveis</div></div></div>
   <div style="display:flex;gap:8px;margin-bottom:16px">
     <button id="emp-tab-vit" class="btn bp" style="font-size:.78rem" onclick="empAnaTab('vit')">VITDSGN</button>
-    <button id="emp-tab-rel" class="btn bo" style="font-size:.78rem" onclick="empAnaTab('rel')">Reliquias Colecionaveis</button>
+    <button id="emp-tab-rel" class="btn bo" style="font-size:.78rem" onclick="empAnaTab('rel')">Reliquias — Vendas OLX</button>
   </div>
   <div id="eana-vit"><div id="vitdsgn-cnt"></div></div>
   <div id="eana-rel" style="display:none">
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
-      <div class="kpi accent"><div class="kpi-l">Total itens</div><div class="kpi-v">${rel.length}</div></div>
-      <div class="kpi"><div class="kpi-l">Valor estimado</div><div class="kpi-v" style="color:#7b2ff7">${fmt(relVal)}</div></div>
-      <div class="kpi"><div class="kpi-l">Vendidos</div><div class="kpi-v" style="color:var(--g)">${fmt(relVend)}</div></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+      <div class="kpi accent"><div class="kpi-l">Disponiveis</div><div class="kpi-v">${relDisp}</div><div class="kpi-s">${relRes} reservado${relRes!==1?'s':''}</div></div>
+      <div class="kpi"><div class="kpi-l">Em anuncio</div><div class="kpi-v" style="color:#7b2ff7">${fmt(relAnunc)}</div><div class="kpi-s">valor total anunciado</div></div>
+      <div class="kpi"><div class="kpi-l">Arrecadado</div><div class="kpi-v" style="color:var(--g)">${fmt(relVend)}</div><div class="kpi-s">${rel.filter(r=>r.status==='vendido').length} vendido${rel.filter(r=>r.status==='vendido').length!==1?'s':''}</div></div>
+      <div class="kpi"><div class="kpi-l">Lucro total</div><div class="kpi-v" style="color:${relLucro>=0?'var(--g)':'var(--r)'}">${relLucro>=0?'+':''}${fmt(relLucro)}</div><div class="kpi-s">venda - custo</div></div>
     </div>
-    <div class="panel">
+    <div class="panel" style="margin-bottom:14px">
+      <h3>Itens para venda <button onclick="relOpen()">+ Adicionar item</button></h3>
       ${buildRelTable(rel)}
     </div>
   </div>`;
   renderVitdsgn();
-  renderVitdsgn();
+}
+function relOpen(){
+  if(!S.reliquias)S.reliquias={itens:[]};
+  const o=document.createElement('div');o.className='mo open';
+  o.onclick=ev=>{if(ev.target===o)document.body.removeChild(o);};
+  o.innerHTML=`<div class="md"><h3>Adicionar item para venda</h3>
+    <div class="fr"><label class="fl">Nome do item</label><input class="fi3" id="rel-n" placeholder="Ex: Funko Pop Naruto, Action Figure..."></div>
+    <div class="fr"><label class="fl">Descricao / condicao</label><input class="fi3" id="rel-d" placeholder="Ex: Lacrado, usado conservado, acompanha caixa..."></div>
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Categoria</label>
+        <select class="fi3" id="rel-cat">
+          <option>Funko Pop</option><option>Action Figure</option><option>Card/TCG</option>
+          <option>Quadrinho</option><option>Brinquedo Vintage</option><option>Eletronico</option>
+          <option>Acessorio</option><option>Outro</option>
+        </select>
+      </div>
+      <div class="fr" style="margin:0"><label class="fl">Plataforma de venda</label>
+        <select class="fi3" id="rel-plat">
+          <option>OLX</option><option>Mercado Livre</option><option>Instagram</option>
+          <option>Enjoei</option><option>Facebook</option><option>Outro</option>
+        </select>
+      </div>
+    </div>
+    <div class="fr2" style="margin-top:10px">
+      <div class="fr" style="margin:0"><label class="fl">Valor pago (custo)</label><input class="fi3" id="rel-vp" type="number" step="0.01" placeholder="0,00"></div>
+      <div class="fr" style="margin:0"><label class="fl">Valor do anuncio (R$)</label><input class="fi3" id="rel-va" type="number" step="0.01" placeholder="0,00"></div>
+    </div>
+    <div class="fr" style="margin-top:10px"><label class="fl">Valor de venda (preencha quando vender)</label><input class="fi3" id="rel-vv" type="number" step="0.01" placeholder="0,00"></div>
+    <div class="ma"><button class="btn bo" onclick="this.closest('.mo').remove()">Cancelar</button>
+    <button class="btn bp" onclick="
+      const n=document.getElementById('rel-n').value.trim(),
+            d=document.getElementById('rel-d').value.trim(),
+            cat=document.getElementById('rel-cat').value,
+            plat=document.getElementById('rel-plat').value,
+            vp=parseFloat(document.getElementById('rel-vp').value)||0,
+            va=parseFloat(document.getElementById('rel-va').value)||0,
+            vv=parseFloat(document.getElementById('rel-vv').value)||0;
+      if(!n){toast('Preencha o nome',true);return;}
+      S.reliquias.itens.push({id:uid(),nome:n,desc:d,cat,plataforma:plat,valorPago:vp,valorAnuncio:va,valorVenda:vv||null,status:vv?'vendido':'disponivel'});
+      saveAll();this.closest('.mo').remove();renderEmpAna();toast('Item adicionado!');
+    ">Salvar</button>
+    </div>
+  </div>`;
+  document.body.appendChild(o);o.querySelector('input').focus();
 }
 function empAnaTab(tab){
   const v=document.getElementById('eana-vit'),r=document.getElementById('eana-rel');
@@ -1791,12 +1840,23 @@ function renderInvestConj(){
   <div class="panel">
     <h3>Caixinha conjunta <button onclick="casalOpenAp()">+ Add</button></h3>
     ${aps.length===0?'<div style="font-size:.81rem;color:var(--mu);font-style:italic">Nenhum aporte conjunto ainda.</div>':
-    aps.map(a=>`<div class="row-item">
-      <div class="dot" style="background:linear-gradient(135deg,#7b2ff7,#e8529a)"></div>
-      <div style="flex:1"><div style="font-weight:600">${a.d}</div><div style="font-family:var(--mo);font-size:.63rem;color:var(--mu)">${a.m||''} · Ana: ${fmt(a.ana||0)} · Let: ${fmt(a.let||0)}</div></div>
-      <span style="font-family:var(--mo);font-size:.82rem;font-weight:600;color:#5b1fa6">+${fmt(a.v)}</span>
-      <button class="db" onclick="gCasal().aportes=gCasal().aportes.filter(x=>x.id!=='${a.id}');saveAll();renderInvestConj()">x</button>
-    </div>`).join('')}
+    aps.map(a=>{
+      const rm=Math.pow(1+(a.taxa||10.65)/100,1/12)-1;
+      const proj1=a.v*Math.pow(1+rm,6),g1=proj1-a.v;
+      return`<div class="row-item" style="align-items:flex-start;padding:10px 0">
+        <div class="dot" style="background:linear-gradient(135deg,#7b2ff7,#e8529a);margin-top:4px"></div>
+        <div style="flex:1">
+          <div style="font-weight:600">${a.d}</div>
+          <div style="font-family:var(--mo);font-size:.63rem;color:var(--mu)">${a.m||''} · Ana: ${fmt(a.ana||0)} · Let: ${fmt(a.let||0)}</div>
+          ${a.onde?`<div style="font-family:var(--mo);font-size:.62rem;color:#7b2ff7;margin-top:1px">${a.onde} · ${a.taxa||10.65}% a.a.</div>`:''}
+          <div style="display:flex;gap:10px;margin-top:4px">
+            <span style="font-family:var(--mo);font-size:.62rem;color:var(--mu)">6m: <b style="color:var(--g)">${fmt(proj1)}</b> (+${fmt(g1)})</span>
+            <span style="font-family:var(--mo);font-size:.62rem;color:var(--mu)">1a: <b style="color:var(--g)">${fmt(a.v*Math.pow(1+rm,12))}</b></span>
+          </div>
+        </div>
+        <span style="font-family:var(--mo);font-size:.88rem;font-weight:600;color:#5b1fa6">+${fmt(a.v)}</span>
+        <button class="db" onclick="gCasal().aportes=gCasal().aportes.filter(x=>x.id!=='${a.id}');saveAll();renderInvestConj()">x</button>
+      </div>`;}).join('')}
   </div>`;
 }
 
@@ -3151,16 +3211,23 @@ function casalOpenMeta(){
   </div>`);
 }
 function casalOpenAp(){
-  showCasalModal(`<div class="md"><h3>Aporte conjunto</h3>
+  showCasalModal(`<div class="md"><h3>Aporte conjunto — Caixinha</h3>
     <div class="fr"><label class="fl">Descricao</label><input class="fi3" id="ca-d" placeholder="Ex: Caixinha viagem, Reserva casal..."></div>
     <div class="fr2">
-      <div class="fr" style="margin:0"><label class="fl">Parte da Ana (R$)</label><input class="fi3" id="ca-a" type="number" step="0.01" placeholder="0" oninput="const a=parseFloat(this.value)||0,b=parseFloat(document.getElementById('ca-l')?.value)||0;const t=document.getElementById('ca-t');if(t)t.value=(a+b).toFixed(2);"></div>
-      <div class="fr" style="margin:0"><label class="fl">Parte da Leticia (R$)</label><input class="fi3" id="ca-l" type="number" step="0.01" placeholder="0" oninput="const a=parseFloat(document.getElementById('ca-a')?.value)||0,b=parseFloat(this.value)||0;const t=document.getElementById('ca-t');if(t)t.value=(a+b).toFixed(2);"></div>
+      <div class="fr" style="margin:0"><label class="fl">Parte da Ana (R$)</label><input class="fi3" id="ca-a" type="number" step="0.01" placeholder="0" oninput="const a=parseFloat(this.value)||0,b=parseFloat(document.getElementById(\'ca-l\')?.value)||0;const t=document.getElementById(\'ca-t\');if(t)t.value=(a+b).toFixed(2);"></div>
+      <div class="fr" style="margin:0"><label class="fl">Parte da Leticia (R$)</label><input class="fi3" id="ca-l" type="number" step="0.01" placeholder="0" oninput="const a=parseFloat(document.getElementById(\'ca-a\')?.value)||0,b=parseFloat(this.value)||0;const t=document.getElementById(\'ca-t\');if(t)t.value=(a+b).toFixed(2);"></div>
     </div>
-    <div class="fr" style="margin-top:10px"><label class="fl">Total calculado</label><input class="fi3" id="ca-t" type="number" step="0.01" placeholder="0" readonly style="background:#f0f0f0;opacity:.7"></div>
-    <div class="fr"><label class="fl">Mes</label><input class="fi3" id="ca-m" type="month" value="${l2m(S.activeMonth)}"></div>
-    <div class="ma"><button class="btn bo" onclick="cm('casal-modal')">Cancelar</button>
-    <button class="btn bp" onclick="const d=document.getElementById('ca-d').value.trim(),ana=parseFloat(document.getElementById('ca-a').value)||0,let_=parseFloat(document.getElementById('ca-l').value)||0,m=m2l(document.getElementById('ca-m').value);if(!d||(ana+let_)===0){toast('Preencha os campos',true);return;}gCasal().aportes.push({id:uid(),d,v:ana+let_,ana,let:let_,m});saveAll();cm('casal-modal');renderCasal();toast('Aporte adicionado');">Salvar</button></div>
+    <div class="fr" style="margin-top:10px"><label class="fl">Total</label><input class="fi3" id="ca-t" type="number" readonly style="background:#f0f0f0;opacity:.7"></div>
+    <div class="fr2" style="margin-top:10px">
+      <div class="fr" style="margin:0"><label class="fl">Mes do aporte</label><input class="fi3" id="ca-m" type="month" value="${l2m(S.activeMonth)}"></div>
+      <div class="fr" style="margin:0"><label class="fl">Rendimento (% a.a.)</label><input class="fi3" id="ca-taxa" type="number" step="0.01" placeholder="10.65" value="10.65"></div>
+    </div>
+    <div class="fr"><label class="fl">Onde esta investido?</label>
+      <select class="fi3" id="ca-onde"><option>Nubank Caixinha</option><option>Nubank Limite Garantido</option><option>Picpay</option><option>C6 Bank</option><option>Inter</option><option>Outro</option></select>
+    </div>
+    <div class="ma"><button class="btn bo" onclick="cm(\'casal-modal\')">Cancelar</button>
+    <button class="btn bp" onclick="const d=document.getElementById(\'ca-d\').value.trim(),ana=parseFloat(document.getElementById(\'ca-a\').value)||0,let_=parseFloat(document.getElementById(\'ca-l\').value)||0,m=m2l(document.getElementById(\'ca-m\').value),taxa=parseFloat(document.getElementById(\'ca-taxa\').value)||10.65,onde=document.getElementById(\'ca-onde\').value;if(!d||(ana+let_)===0){toast(\'Preencha os campos\',true);return;}gCasal().aportes.push({id:uid(),d,v:ana+let_,ana,let:let_,m,taxa,onde});saveAll();cm(\'casal-modal\');renderCasal();renderInvestConj();toast(\'Aporte adicionado\');">Salvar</button>
+    </div>
   </div>`);
 }
 function showCasalModal(html){
