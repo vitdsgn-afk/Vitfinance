@@ -501,6 +501,18 @@ input[type=month]:focus{border-color:var(--g);background:#fff;}
   <div class="ma"><button class="btn bo" onclick="cm('mMet')">Cancelar</button><button class="btn bp" onclick="savMeta()">Salvar</button></div>
 </div></div>
 
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyALtCQ0FKCqbiWrRXZUWd2C-sATCNNk1zg",authDomain:"vitfinance-1d30d.firebaseapp.com",projectId:"vitfinance-1d30d",storageBucket:"vitfinance-1d30d.firebasestorage.app",messagingSenderId:"81249244978",appId:"1:81249244978:web:358cbe1dc0f4841ab6692b"};
+const db=getFirestore(initializeApp(cfg));
+const DOC=doc(db,'vitf2','dados');
+// Salva no Firebase (chamado só pelo saveAll)
+window._fbSave=async d=>{try{await setDoc(DOC,{payload:JSON.stringify(d),ts:Date.now()});return true;}catch(e){return false;}};
+// Carrega do Firebase — retorna null se offline ou sem dados
+window._fbLoad=async()=>{try{const s=await getDoc(DOC);return s.exists()?JSON.parse(s.data().payload):null;}catch(e){return null;}};
+</script>
+
 <script>
 // ── HELPERS ──
 const MNS=['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -518,9 +530,8 @@ function toast(msg,e=false){const t=document.getElementById('toast');t.textConte
 let S={
   months:['Abril 2026'],activeMonth:'Abril 2026',
   salarios:{},dividasFixas:{},installments:[],statusMap:{},movimentos:{},aportes:[],metas:[],
-  vitdsgn:{projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0}
+  vitdsgn:{projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0,metas_meses:{}}
 };
-const KEY='vitf_1';
 function gS(m){if(!S.salarios[m])S.salarios[m]=[];return S.salarios[m];}
 function gD(m){if(!S.dividasFixas[m])S.dividasFixas[m]=[];return S.dividasFixas[m];}
 function gMv(m){if(!S.movimentos[m])S.movimentos[m]=[];return S.movimentos[m];}
@@ -537,25 +548,61 @@ function gI(m){
 }
 
 // ── PERSIST ──
+const KEY='vitf_1';
 function saveAll(){
   readDOM();
+  S._ts=Date.now();
   localStorage.setItem(KEY,JSON.stringify(S));
-  const e=document.getElementById('sv');
-  e.textContent='salvo';e.classList.add('on');
-  setTimeout(()=>e.classList.remove('on'),2000);
+  // Salva no Firebase em background
+  if(window._fbSave){
+    window._fbSave(S).then(ok=>{
+      const e=document.getElementById('sv');
+      e.textContent=ok?'salvo na nuvem':'salvo local';
+      e.classList.add('on');
+      setTimeout(()=>e.classList.remove('on'),2500);
+    });
+  } else {
+    const e=document.getElementById('sv');
+    e.textContent='salvo';e.classList.add('on');
+    setTimeout(()=>e.classList.remove('on'),2000);
+  }
 }
 setInterval(saveAll,30000);
-function loadSt(){
+function loadSt(cb){
+  // 1. Carrega localStorage imediatamente
   try{
     const r=localStorage.getItem(KEY);
     if(r){const p=JSON.parse(r);if(p&&Array.isArray(p.months)&&p.months.length)S=p;}
   }catch(e){}
+  // 2. Verifica Firebase — usa se for mais recente
+  if(window._fbLoad){
+    window._fbLoad().then(remote=>{
+      if(remote&&Array.isArray(remote.months)&&remote.months.length){
+        const remoteTs=remote._ts||0;
+        const localTs=S._ts||0;
+        if(remoteTs>localTs){
+          // Firebase tem dados mais recentes — usa e salva local
+          S=remote;
+          localStorage.setItem(KEY,JSON.stringify(S));
+          toast('Dados sincronizados da nuvem');
+          fullRender();
+        } else if(localTs>remoteTs){
+          // Local mais recente — envia para Firebase
+          window._fbSave(S);
+        }
+      } else if(S._ts){
+        // Firebase vazio mas temos dados locais — envia
+        window._fbSave(S);
+      }
+    }).catch(()=>{});
+  }
+  if(cb)cb();
 }
 function doReset(){
   if(!confirm('Apagar todos os dados?'))return;
   localStorage.removeItem(KEY);
   S={months:['Abril 2026'],activeMonth:'Abril 2026',salarios:{},dividasFixas:{},installments:[],statusMap:{},movimentos:{},aportes:[],metas:[],
-  vitdsgn:{projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0}};
+  vitdsgn:{projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0,metas_meses:{}}};
   fullRender();toast('Dados apagados');
 }
 function readDOM(){
@@ -1184,7 +1231,7 @@ function renderInvest() {
 }
 
 // ── VITDSGN ──
-function vd(){ if(!S.vitdsgn) S.vitdsgn={projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0}; return S.vitdsgn; }
+function vd(){ if(!S.vitdsgn) S.vitdsgn={projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0,metas_meses:{}}; if(!S.vitdsgn.metas_meses) S.vitdsgn.metas_meses={}; return S.vitdsgn; }
 
 function renderVitdsgn(){
   const e=document.getElementById('vitdsgn-cnt'); if(!e) return;
@@ -1237,23 +1284,105 @@ function renderVitdsgn(){
   </div>
 </div>
 
-<!-- META DE RECEITA MENSAL -->
+<!-- PREVISAO 3 MESES -->
+${(()=>{
+  // Gera os proximos 3 meses a partir do mes ativo
+  const meses3 = [0,1,2].map(i => addM(S.activeMonth, i));
+  return `
 <div class="inv-section" style="margin-bottom:14px">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-    <h3 style="margin:0;border:none;padding:0">Meta de receita mensal</h3>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input id="vd-meta" type="number" class="fi3" style="width:130px;padding:5px 9px;font-size:.8rem" placeholder="Ex: 5000" value="${d.receita_meta||''}" oninput="vd().receita_meta=parseFloat(this.value)||0;renderVitdsgn()">
-    </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <h3 style="margin:0;border:none;padding:0">Previsao de receita — proximos 3 meses</h3>
   </div>
-  ${d.receita_meta>0?`
-  <div style="height:8px;background:var(--bor);border-radius:99px;overflow:hidden;margin-bottom:6px">
-    <div style="height:100%;width:${Math.min(100,Math.round(totalRecebido/d.receita_meta*100))}%;background:linear-gradient(90deg,#a020c8,#da6ef5);border-radius:99px;transition:width .5s"></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+    ${meses3.map((mes,idx) => {
+      const mm = d.metas_meses[mes] || {meta:0, obs:''};
+      // Trabalhos fechados para este mes (por prazo)
+      const trabMes = proj.filter(p => {
+        if(!p.prazo) return false;
+        const [y,m] = p.prazo.split('-');
+        const mesLabel = MNS[parseInt(m)-1]+' '+y;
+        return mesLabel === mes;
+      });
+      const totalFechado = trabMes.reduce((s,p)=>s+(p.valor||0),0);
+      const totalPago    = trabMes.filter(p=>p.status==='pago').reduce((s,p)=>s+(p.valor||0),0);
+      const meta         = mm.meta||0;
+      const pct          = meta>0 ? Math.min(100,Math.round(totalFechado/meta*100)) : 0;
+      const corBarra     = pct>=100 ? 'var(--g)' : pct>=60 ? '#a020c8' : 'var(--w)';
+      const isAtual      = idx===0;
+      return `
+      <div style="background:${isAtual?'#f9f0ff':'var(--sur)'};border:${isAtual?'2px solid #a020c8':'1px solid var(--bor)'};border-radius:10px;padding:15px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div>
+            <div style="font-family:var(--mo);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:${isAtual?'#a020c8':'var(--mu)'};">${isAtual?'Atual':''}${idx===1?'Proximo mes':''}${idx===2?'Em 2 meses':''}</div>
+            <div style="font-weight:700;font-size:.9rem;margin-top:1px">${mes}</div>
+          </div>
+          ${pct>=100?'<span style="font-family:var(--mo);font-size:.6rem;background:#a020c8;color:#fff;padding:2px 7px;border-radius:20px">Meta!</span>':''}
+        </div>
+
+        <!-- Meta do mes -->
+        <div style="margin-bottom:10px">
+          <div style="font-family:var(--mo);font-size:.59rem;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Meta do mes</div>
+          <input type="number" class="fi3" style="padding:5px 8px;font-size:.82rem;font-family:var(--mo)" placeholder="R$ meta..." value="${mm.meta||''}"
+            oninput="if(!vd().metas_meses)vd().metas_meses={};vd().metas_meses['${mes}']={...vd().metas_meses['${mes}']||{},meta:parseFloat(this.value)||0};saveAll();renderVitdsgn()">
+        </div>
+
+        <!-- Barra de progresso -->
+        ${meta>0?`
+        <div style="height:6px;background:var(--bor);border-radius:99px;overflow:hidden;margin-bottom:6px">
+          <div style="height:100%;width:${pct}%;background:${corBarra};border-radius:99px;transition:width .4s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:.65rem;color:var(--mu);margin-bottom:10px">
+          <span>${fmt(totalFechado)} fechado</span><span>${pct}% da meta</span>
+        </div>`:'<div style="margin-bottom:10px"></div>'}
+
+        <!-- Trabalhos fechados para este mes -->
+        <div style="font-family:var(--mo);font-size:.59rem;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Trabalhos fechados</div>
+        ${trabMes.length===0?
+          `<div style="font-size:.78rem;color:var(--mu);font-style:italic;margin-bottom:8px">Nenhum trabalho com prazo neste mes.</div>`
+          :trabMes.map(p=>`
+          <div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--bor);font-size:.8rem">
+            <div style="width:6px;height:6px;border-radius:50%;background:${p.status==='pago'?'var(--g)':p.status==='execucao'?'#a020c8':'var(--w)'};flex-shrink:0"></div>
+            <div style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.servico}</div>
+            <div style="font-family:var(--mo);font-size:.75rem;font-weight:500;color:${p.status==='pago'?'var(--g)':'var(--tx)'};white-space:nowrap">${fmt(p.valor||0)}</div>
+          </div>`).join('')
+        }
+        ${trabMes.length>0?`
+        <div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:.72rem;padding-top:7px;font-weight:600">
+          <span style="color:var(--mu)">Total fechado</span>
+          <span style="color:#a020c8">${fmt(totalFechado)}</span>
+        </div>
+        ${totalPago>0?`<div style="font-family:var(--mo);font-size:.65rem;color:var(--g);text-align:right">${fmt(totalPago)} ja recebido</div>`:''}
+        `:''}
+
+        <!-- Obs / nota do mes -->
+        <div style="margin-top:10px">
+          <input type="text" class="fi3" style="padding:5px 8px;font-size:.76rem" placeholder="Observacoes do mes..."
+            value="${(mm.obs||'').replace(/"/g,'&quot;')}"
+            oninput="if(!vd().metas_meses)vd().metas_meses={};vd().metas_meses['${mes}']={...vd().metas_meses['${mes}']||{},obs:this.value};saveAll()">
+        </div>
+      </div>`;
+    }).join('')}
   </div>
-  <div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:.7rem;color:var(--mu)">
-    <span>Recebido: ${fmt(totalRecebido)}</span>
-    <span>${Math.min(100,Math.round(totalRecebido/d.receita_meta*100))}% da meta de ${fmt(d.receita_meta)}</span>
-  </div>`:'<div style="font-size:.81rem;color:var(--mu);font-style:italic">Defina sua meta de receita mensal acima.</div>'}
-</div>
+
+  <!-- Resumo total 3 meses -->
+  ${(()=>{
+    const totalMeta3 = meses3.reduce((s,m)=>s+(d.metas_meses[m]?.meta||0),0);
+    const totalFech3 = meses3.reduce((s,mes)=>s+proj.filter(p=>{
+      if(!p.prazo)return false;
+      const[y,mo]=p.prazo.split('-');return (MNS[parseInt(mo)-1]+' '+y)===mes;
+    }).reduce((s2,p)=>s2+(p.valor||0),0),0);
+    return totalMeta3>0||totalFech3>0?`
+    <div style="margin-top:14px;padding:12px 14px;background:#f9f0ff;border-radius:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div style="font-family:var(--mo);font-size:.65rem;color:#a020c8;text-transform:uppercase;letter-spacing:.06em">Total 3 meses</div>
+      <div style="display:flex;gap:20px">
+        ${totalMeta3>0?`<div style="text-align:right"><div style="font-family:var(--mo);font-size:.65rem;color:var(--mu)">Meta total</div><div style="font-family:var(--mo);font-size:.92rem;font-weight:600;color:#a020c8">${fmt(totalMeta3)}</div></div>`:''}
+        <div style="text-align:right"><div style="font-family:var(--mo);font-size:.65rem;color:var(--mu)">Trabalhos fechados</div><div style="font-family:var(--mo);font-size:.92rem;font-weight:600;color:var(--g)">${fmt(totalFech3)}</div></div>
+        ${totalMeta3>0?`<div style="text-align:right"><div style="font-family:var(--mo);font-size:.65rem;color:var(--mu)">Projecao vs meta</div><div style="font-family:var(--mo);font-size:.92rem;font-weight:600;color:${totalFech3>=totalMeta3?'var(--g)':'var(--w)'}">${Math.round(totalFech3/totalMeta3*100)}%</div></div>`:''}
+      </div>
+    </div>`:'';
+  })()}
+</div>`;
+})()}
 
 <!-- PROJETOS / TRABALHOS EM EXECUÇÃO -->
 <div class="inv-section" style="margin-bottom:14px">
@@ -1340,9 +1469,6 @@ function renderVitdsgn(){
   </div>
 </div>`;
 
-  // Re-bind meta input after render
-  const metaInp = document.getElementById('vd-meta');
-  if(metaInp) metaInp.value = d.receita_meta||'';
 }
 
 // VITDSGN MODALS
@@ -1588,7 +1714,14 @@ function savMeta(){
 
 
 // ── INIT ──
-loadSt();
+loadSt(()=>{
+  renderMNav();
+  renderMC(S.activeMonth);
+  renderFeed();
+  document.getElementById('fdate').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+});
+
+// Dados padrão — só aplica se localStorage estiver vazio
 
 // Atualiza mes ativo para Maio 2026 se nao houver dados salvos
 if(!S.aportes || !S.aportes.length) {
@@ -1699,6 +1832,23 @@ if(!S.installments || !S.installments.length) {
     ];
   }
 
+  // VITDSGN - dados iniciais
+  if(!S.vitdsgn || !S.vitdsgn.projetos || !S.vitdsgn.projetos.length) {
+    if(!S.vitdsgn) S.vitdsgn={projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0,metas_meses:{}};
+    S.vitdsgn.projetos = [
+      {id:uid(),servico:'Identidade Visual | Barbearia Mattos',cliente:'Jhullyne',valor:180,prazo:'2026-05-01',status:'execucao'},
+      {id:uid(),servico:'Identidade Visual | Anna Oliveira Studio',cliente:'Anna Clara',valor:300,prazo:'2026-05-15',status:'aguardando'},
+      {id:uid(),servico:'Formulacao | Linkedin',cliente:'Konex Engenharia',valor:200,prazo:'2026-04-15',status:'aguardando'},
+    ];
+  }
+  if(!S.vitdsgn.tarefas || !S.vitdsgn.tarefas.length) {
+    S.vitdsgn.tarefas = [
+      {id:uid(),texto:'Reunir bons trabalhos | Portfolio',cat:'Portfolio',prioridade:'alta',feita:false},
+      {id:uid(),texto:'Montar Portfolio atrelado a curriculo',cat:'Portfolio',prioridade:'alta',feita:false},
+      {id:uid(),texto:'Elaborar estrategia | Nova Cliente',cat:'Processo',prioridade:'alta',feita:false},
+    ];
+  }
+
   // Replica salarios e dividas fixas de Abril 2026 para todos os outros meses
   replicarParaTodosMeses();
   localStorage.setItem(KEY, JSON.stringify(S));
@@ -1722,10 +1872,6 @@ function replicarParaTodosMeses() {
   });
 }
 
-renderMNav();
-renderMC(S.activeMonth);
-renderFeed();
-document.getElementById('fdate').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
 </script>
 </body>
 </html>
