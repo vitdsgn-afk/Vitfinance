@@ -234,6 +234,46 @@ input[type=month]:focus{border-color:var(--g);background:#fff;}
 .ts{background:#2a1535;color:#52c77a;border:1px solid rgba(82,199,122,.28);}
 .te{background:var(--r);color:#fff;}
 
+/* LETICIA / CASAL */
+.let-accent{color:#e8529a;}
+.let-bg{background:linear-gradient(135deg,#2a1535,#7a2060);}
+.sec-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;padding-bottom:14px;border-bottom:1.5px solid var(--bor2);}
+.sec-name{font-family:'Sora',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:-.02em;}
+.sec-sub{font-size:.82rem;color:var(--mu);font-style:italic;margin-top:2px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.kpi{background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:14px 16px;}
+.kpi.accent{background:linear-gradient(135deg,#2a1535,#6b2d9a);color:#fff;border:none;}
+.kpi.pink{background:linear-gradient(135deg,#2a1535,#7a2060);color:#fff;border:none;}
+.kpi-l{font-family:var(--mo);font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;opacity:.7;margin-bottom:5px;}
+.kpi-v{font-family:var(--mo);font-size:1.1rem;font-weight:600;}
+.kpi-s{font-family:var(--mo);font-size:.63rem;opacity:.6;margin-top:2px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;}
+.panel{background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:18px;}
+.panel h3{font-size:.87rem;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--bor);display:flex;align-items:center;justify-content:space-between;}
+.panel h3 button{font-size:.68rem;font-family:var(--mo);background:var(--bg);border:1px solid var(--bor2);padding:3px 9px;border-radius:5px;cursor:pointer;color:var(--tx);}
+.panel h3 button:hover{background:#a020c8;color:#fff;border-color:#a020c8;}
+.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-family:var(--mo);font-size:.62rem;font-weight:500;}
+.pill-g{background:var(--gl);color:var(--g);}
+.pill-r{background:var(--rl);color:var(--r);}
+.pill-p{background:#f0d6f8;color:#a020c8;}
+.pill-pink{background:#fde8f3;color:#c0407a;}
+.pill-y{background:var(--wl);color:var(--w);}
+.row-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bor);font-size:.83rem;}
+.row-item:last-child{border-bottom:none;}
+.row-item .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+/* Gauge chart */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;padding:10px 0;}
+.gauge-label{font-family:var(--mo);font-size:.68rem;color:var(--mu);margin-top:4px;}
+/* Dividas conjuntas */
+.dc-split{display:flex;gap:6px;align-items:center;font-family:var(--mo);font-size:.75rem;}
+.dc-bar{flex:1;height:8px;background:var(--bor);border-radius:99px;overflow:hidden;display:flex;}
+.dc-ana{background:#a020c8;}
+.dc-let{background:#e8529a;}
+/* Casal meta card */
+.cmeta{background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:15px;margin-bottom:8px;}
+.cmeta.win{border-color:#a020c8;background:#f9f0ff;}
+
 /* INVEST PAGE */
 .inv-hero{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
 .inv-card{background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:16px 18px;}
@@ -294,6 +334,10 @@ input[type=month]:focus{border-color:var(--g);background:#fff;}
     <div class="sb-it" onclick="goVw('invest',this)">Investimentos</div>
     <div class="sb-sec">Studio</div>
     <div class="sb-it" onclick="goVw('vitdsgn',this)">VITDSGN</div>
+    <div class="sb-sec">Casal</div>
+    <div class="sb-it" onclick="goVw('leticia',this)">Leticia</div>
+    <div class="sb-it" onclick="goVw('casal',this)">Nos Duas</div>
+    <div class="sb-it" onclick="goVw('divconj',this)">Dividas Conjuntas</div>
   </nav>
 </aside>
 <button class="sb-btn" onclick="toggleSb()">&#8801;</button>
@@ -375,6 +419,21 @@ input[type=month]:focus{border-color:var(--g);background:#fff;}
     <!-- VITDSGN -->
     <div class="vw" id="vw-vitdsgn">
       <div id="vitdsgn-cnt"></div>
+    </div>
+
+    <!-- LETICIA -->
+    <div class="vw" id="vw-leticia">
+      <div id="let-cnt"></div>
+    </div>
+
+    <!-- NOS DUAS -->
+    <div class="vw" id="vw-casal">
+      <div id="casal-cnt"></div>
+    </div>
+
+    <!-- DIVIDAS CONJUNTAS -->
+    <div class="vw" id="vw-divconj">
+      <div id="divconj-cnt"></div>
     </div>
 
   </div>
@@ -530,7 +589,9 @@ function toast(msg,e=false){const t=document.getElementById('toast');t.textConte
 let S={
   months:['Abril 2026'],activeMonth:'Abril 2026',
   salarios:{},dividasFixas:{},installments:[],statusMap:{},movimentos:{},aportes:[],metas:[],
-  vitdsgn:{projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0,metas_meses:{}}
+  vitdsgn:{projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0,metas_meses:{}},
+  leticia:{salarios:[],dividasFixas:[],installments:[],aportes:[],activeMonth:'Maio 2026'},
+  casal:{metas:[],divConj:[],aportes:[],notas:''}
 };
 function gS(m){if(!S.salarios[m])S.salarios[m]=[];return S.salarios[m];}
 function gD(m){if(!S.dividasFixas[m])S.dividasFixas[m]=[];return S.dividasFixas[m];}
@@ -602,7 +663,9 @@ function doReset(){
   if(!confirm('Apagar todos os dados?'))return;
   localStorage.removeItem(KEY);
   S={months:['Abril 2026'],activeMonth:'Abril 2026',salarios:{},dividasFixas:{},installments:[],statusMap:{},movimentos:{},aportes:[],metas:[],
-  vitdsgn:{projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0,metas_meses:{}}};
+  vitdsgn:{projetos:[],tarefas:[],ideias:[],clientes:[],receita_meta:0,metas_meses:{}},
+  leticia:{salarios:[],dividasFixas:[],installments:[],aportes:[],activeMonth:'Maio 2026'},
+  casal:{metas:[],divConj:[],aportes:[],notas:''}};
   fullRender();toast('Dados apagados');
 }
 function readDOM(){
@@ -641,6 +704,9 @@ function goVw(n,el){
   if(n==='metas')renderMetas();
   if(n==='invest')renderInvest();
   if(n==='vitdsgn')renderVitdsgn();
+  if(n==='leticia')renderLeticia();
+  if(n==='casal')renderCasal();
+  if(n==='divconj')renderDivConj();
 }
 function fullRender(){
   renderMNav();renderMC(S.activeMonth);renderFeed();
@@ -1712,6 +1778,689 @@ function savMeta(){
   renderMetas();toast('Meta criada');
 }
 
+
+// ══════════════════════════════════════════════
+// LETICIA
+// ══════════════════════════════════════════════
+function gLet(){ if(!S.leticia) S.leticia={salarios:[],dividasFixas:[],installments:[],aportes:[],activeMonth:'Maio 2026'}; return S.leticia; }
+
+function renderLeticia(){
+  const e=document.getElementById('let-cnt'); if(!e) return;
+  const L=gLet();
+  const sal=L.salarios||[];
+  const dix=L.dividasFixas||[];
+  const inst=L.installments||[];
+  const aps=L.aportes||[];
+  const totalSal=sal.reduce((s,x)=>s+pv(x.valor),0);
+  const totalDix=dix.reduce((s,x)=>s+pv(x.valor),0);
+  const totalInst=inst.reduce((s,x)=>s+x.vp,0);
+  const totalDiv=totalDix+totalInst;
+  const saldo=totalSal-totalDiv;
+  const pctComp=totalSal>0?Math.min(100,Math.round(totalDiv/totalSal*100)):0;
+  const totalInv=aps.reduce((s,a)=>s+a.v,0);
+  const saude=pctComp<=50?'Excelente':pctComp<=70?'Boa':pctComp<=90?'Atencao':'Critica';
+  const saudeCor=pctComp<=50?'var(--g)':pctComp<=70?'#a020c8':pctComp<=90?'var(--w)':'var(--r)';
+
+  e.innerHTML=`
+  <div class="sec-header">
+    <div>
+      <div class="sec-name" style="color:#c0407a">Leticia</div>
+      <div class="sec-sub">Controle financeiro pessoal</div>
+    </div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="btn" style="font-size:.71rem;padding:5px 10px;background:#fde8f3;color:#c0407a;border:none" onclick="letOpenSal()">+ Salario</button>
+      <button class="btn" style="font-size:.71rem;padding:5px 10px;background:#fde8f3;color:#c0407a;border:none" onclick="letOpenDix()">+ Divida</button>
+      <button class="btn" style="font-size:.71rem;padding:5px 10px;background:#fde8f3;color:#c0407a;border:none" onclick="letOpenCart()">+ Cartao</button>
+      <button class="btn bp" style="font-size:.71rem;padding:5px 10px" onclick="letOpenAp()">+ Aporte</button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi pink">
+      <div class="kpi-l">Receita total</div>
+      <div class="kpi-v">${fmt(totalSal)}</div>
+      <div class="kpi-s">${sal.length} fonte${sal.length!==1?'s':''} de renda</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-l">Total dividas</div>
+      <div class="kpi-v" style="color:var(--r)">${fmt(totalDiv)}</div>
+      <div class="kpi-s">${pctComp}% da renda</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-l">Saldo livre</div>
+      <div class="kpi-v" style="color:${saldo>=0?'var(--g)':'var(--r)'}">${fmt(saldo)}</div>
+      <div class="kpi-s">${saldo>=0?'positivo':'negativo'}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-l">Investimentos</div>
+      <div class="kpi-v" style="color:#a020c8">${fmt(totalInv)}</div>
+      <div class="kpi-s">${aps.length} aporte${aps.length!==1?'s':''}</div>
+    </div>
+  </div>
+
+  <!-- SAUDE + GRAFICO DISTRIBUICAO -->
+  <div class="grid2">
+    <div class="panel">
+      <h3>Saude financeira</h3>
+      <div style="text-align:center;padding:10px 0 14px">
+        ${letGauge(pctComp, saudeCor)}
+        <div style="font-weight:700;font-size:.95rem;margin-top:8px;color:${saudeCor}">${saude}</div>
+        <div style="font-family:var(--mo);font-size:.68rem;color:var(--mu);margin-top:3px">${pctComp}% comprometido</div>
+      </div>
+      <div style="margin-top:8px">
+        ${[
+          {l:'Receita',v:totalSal,c:'var(--g)'},
+          {l:'Div. Fixas',v:totalDix,c:'var(--r)'},
+          {l:'Cartoes',v:totalInst,c:'#a020c8'},
+          {l:'Saldo',v:saldo,c:saldo>=0?'var(--g)':'var(--r)'},
+        ].map(x=>`<div class="row-item">
+          <div class="dot" style="background:${x.c}"></div>
+          <span style="flex:1;color:var(--mu)">${x.l}</span>
+          <span style="font-family:var(--mo);font-size:.8rem;font-weight:600;color:${x.c}">${fmt(x.v)}</span>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Distribuicao da renda</h3>
+      ${letBarChart(totalSal,totalDix,totalInst,saldo)}
+      <div style="margin-top:12px">
+        <div style="height:6px;background:var(--bor);border-radius:99px;overflow:hidden;margin-bottom:5px">
+          <div style="height:100%;width:${pctComp}%;background:linear-gradient(90deg,${saudeCor},${saudeCor}88);border-radius:99px"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:.65rem;color:var(--mu)">
+          <span>Comprometido: ${pctComp}%</span><span>Livre: ${100-pctComp}%</span>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div style="font-family:var(--mo);font-size:.6rem;color:var(--mu);text-transform:uppercase;margin-bottom:8px">Regra 50·30·20</div>
+        ${[{l:'50% Necessidades',v:totalSal*.5,c:'var(--r)'},{l:'30% Desejos',v:totalSal*.3,c:'var(--w)'},{l:'20% Investir',v:totalSal*.2,c:'var(--g)'}].map(x=>`
+        <div style="display:flex;justify-content:space-between;font-size:.8rem;padding:4px 0;border-bottom:1px solid var(--bor)">
+          <span style="color:var(--mu)">${x.l}</span>
+          <span style="font-family:var(--mo);font-weight:500;color:${x.c}">${fmt(x.v)}</span>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- SALARIOS + DIVIDAS FIXAS -->
+  <div class="grid2">
+    <div class="panel">
+      <h3>Salarios / Renda <button onclick="letOpenSal()">+ Add</button></h3>
+      ${sal.length===0?'<div style="font-size:.81rem;color:var(--mu);font-style:italic">Nenhum salario cadastrado.</div>':''}
+      ${sal.sort((a,b)=>parseInt(a.dia||0)-parseInt(b.dia||0)).map(s=>`
+      <div class="row-item">
+        <div class="dot" style="background:var(--g)"></div>
+        <div style="flex:1"><div style="font-weight:600">${s.desc}</div><div style="font-family:var(--mo);font-size:.65rem;color:var(--mu)">dia ${s.dia}</div></div>
+        <span style="font-family:var(--mo);font-size:.85rem;font-weight:600;color:var(--g)">${fmt(pv(s.valor))}</span>
+        <button class="db" onclick="gLet().salarios=gLet().salarios.filter(x=>x.id!=='${s.id}');saveAll();renderLeticia()">x</button>
+      </div>`).join('')}
+    </div>
+    <div class="panel">
+      <h3>Dividas Fixas <button onclick="letOpenDix()">+ Add</button></h3>
+      ${dix.length===0?'<div style="font-size:.81rem;color:var(--mu);font-style:italic">Nenhuma divida fixa cadastrada.</div>':''}
+      ${dix.map(d=>`
+      <div class="row-item" style="${d.status==='pago'?'background:#f0fff4;padding:4px 6px;border-radius:6px;':''}">
+        <div class="dot" style="background:${d.status==='pago'?'var(--g)':d.status==='atrasado'?'var(--r)':'var(--w)'}"></div>
+        <div style="flex:1"><div style="font-weight:600">${d.desc}</div><div style="font-family:var(--mo);font-size:.65rem;color:var(--mu)">dia ${d.dia} · ${d.cat||''}</div></div>
+        <span style="font-family:var(--mo);font-size:.82rem;font-weight:600;color:var(--r)">${fmt(pv(d.valor))}</span>
+        <button class="db" onclick="gLet().dividasFixas=gLet().dividasFixas.filter(x=>x.id!=='${d.id}');saveAll();renderLeticia()">x</button>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- CARTOES -->
+  <div class="panel" style="margin-bottom:14px">
+    <h3>Cartoes de Credito <span style="font-family:var(--mo);font-size:.7rem;color:var(--r);margin-left:8px">${fmt(totalInst)}</span><button onclick="letOpenCart()">+ Add</button></h3>
+    ${inst.length===0?'<div style="font-size:.81rem;color:var(--mu);font-style:italic">Nenhum item de cartao cadastrado.</div>':''}
+    ${inst.length>0?`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.82rem">
+      <thead><tr>
+        <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:5px 10px;text-align:left;border-bottom:1px solid var(--bor)">Descricao</th>
+        <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:5px 10px;border-bottom:1px solid var(--bor)">Cartao</th>
+        <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:5px 10px;text-align:right;border-bottom:1px solid var(--bor)">Parcela</th>
+        <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:5px 10px;text-align:right;border-bottom:1px solid var(--bor)">Valor</th>
+        <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:5px 10px;border-bottom:1px solid var(--bor)">Finaliza</th>
+        <th style="width:24px;border-bottom:1px solid var(--bor)"></th>
+      </tr></thead>
+      <tbody>
+        ${inst.map(it=>{
+          const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;
+          const pa=mi(L.activeMonth)-mi(ms)+1;
+          const mf=addM(ms,it.tp-1);
+          const fin=pa===it.tp;
+          return `<tr style="${fin?'background:#f9f0ff;':''}">
+            <td style="padding:8px 10px;border-bottom:1px solid var(--bor);font-weight:600">${it.desc}</td>
+            <td style="padding:8px 10px;border-bottom:1px solid var(--bor)"><span class="pill pill-p">${it.cartao==='d08'?'Dia 08':it.cartao==='d15'?'Dia 15':it.cartao==='d23'?'Dia 23':'Dia 25'}</span></td>
+            <td style="padding:8px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);font-size:.78rem">${pa}/${it.tp<=120?it.tp:'cont.'}</td>
+            <td style="padding:8px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);font-weight:600;color:var(--r)">${fmt(it.vp)}</td>
+            <td style="padding:8px 10px;border-bottom:1px solid var(--bor)"><span class="pill ${fin?'pill-p':'pill-y'}" style="font-size:.59rem">${it.tp<=120?mf+(fin?' fim':''):'Continuo'}</span></td>
+            <td style="padding:8px 10px;border-bottom:1px solid var(--bor)"><button class="db" onclick="gLet().installments=gLet().installments.filter(x=>x.id!=='${it.id}');saveAll();renderLeticia()">x</button></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table></div>`:''}
+  </div>
+
+  <!-- INVESTIMENTOS LETICIA -->
+  <div class="panel" style="margin-bottom:14px">
+    <h3>Investimentos <span style="font-family:var(--mo);font-size:.7rem;color:#a020c8;margin-left:8px">${fmt(totalInv)}</span><button onclick="letOpenAp()">+ Add</button></h3>
+    ${aps.length===0?'<div style="font-size:.81rem;color:var(--mu);font-style:italic">Nenhum aporte registrado ainda.</div>':
+    `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        ${aps.map(a=>`<div class="row-item">
+          <div class="dot" style="background:#a020c8"></div>
+          <div style="flex:1"><div style="font-weight:600">${a.d}</div><div style="font-family:var(--mo);font-size:.65rem;color:var(--mu)">${a.m}</div></div>
+          <span style="font-family:var(--mo);font-size:.82rem;color:#a020c8;font-weight:600">+${fmt(a.v)}</span>
+          <button class="db" onclick="gLet().aportes=gLet().aportes.filter(x=>x.id!=='${a.id}');saveAll();renderLeticia()">x</button>
+        </div>`).join('')}
+      </div>
+      <div style="background:#f9f0ff;border-radius:8px;padding:14px">
+        <div style="font-family:var(--mo);font-size:.6rem;color:var(--mu);text-transform:uppercase;margin-bottom:10px">Projecao 105% CDI</div>
+        ${[{l:'6 meses',m:6},{l:'1 ano',m:12},{l:'2 anos',m:24},{l:'5 anos',m:60}].map(p=>{
+          const v=projCompound(totalInv,CDI_AA*1.05,p.m),g=v-totalInv;
+          return `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #e8d8f8">
+            <span style="font-size:.8rem">${p.l}</span>
+            <div style="text-align:right">
+              <div style="font-family:var(--mo);font-size:.85rem;font-weight:600;color:#a020c8">${fmt(v)}</div>
+              <div style="font-family:var(--mo);font-size:.63rem;color:var(--mu)">+${fmt(g)}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`}
+  </div>`;
+}
+
+function letGauge(pct, cor){
+  const r=44,cx=60,cy=60;
+  const circ=Math.PI*r;
+  const dash=circ*(pct/100);
+  return `<svg viewBox="0 0 120 70" style="width:140px;height:85px">
+    <path d="M16,60 A44,44 0 0,1 104,60" fill="none" stroke="#e8e5df" stroke-width="10" stroke-linecap="round"/>
+    <path d="M16,60 A44,44 0 0,1 104,60" fill="none" stroke="${cor}" stroke-width="10" stroke-linecap="round"
+      stroke-dasharray="${dash} ${circ}" stroke-dashoffset="0" style="transition:stroke-dasharray .6s"/>
+    <text x="60" y="58" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" font-weight="700" fill="${cor}">${pct}%</text>
+  </svg>`;
+}
+
+function letBarChart(sal,dix,inst,saldo){
+  const max=Math.max(sal,dix+inst,1);
+  const items=[
+    {l:'Receita',v:sal,c:'var(--g)'},
+    {l:'Div.Fixas',v:dix,c:'var(--r)'},
+    {l:'Cartoes',v:inst,c:'#a020c8'},
+    {l:'Saldo',v:Math.abs(saldo),c:saldo>=0?'var(--g)':'var(--r)'},
+  ];
+  return `<svg viewBox="0 0 280 90" style="width:100%;height:90px">
+    ${items.map((x,i)=>{
+      const h=max>0?Math.round((x.v/max)*70):0,bw=44,gap=12,xp=i*(bw+gap)+10;
+      return `<g>
+        <rect x="${xp}" y="${80-h}" width="${bw}" height="${h}" rx="4" fill="${x.c}" opacity=".85"/>
+        <text x="${xp+bw/2}" y="88" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#8a8478">${x.l}</text>
+      </g>`;
+    }).join('')}
+  </svg>`;
+}
+
+// LETICIA MODALS
+function letOpenSal(){
+  showLetModal(`<div class="md"><h3>Salario / Renda — Leticia</h3>
+    <div class="fr"><label class="fl">Descricao</label><input class="fi3" id="ls-d" placeholder="Ex: Salario, Freelance..."></div>
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Valor (R$)</label><input class="fi3" id="ls-v" type="number" step="0.01"></div>
+      <div class="fr" style="margin:0"><label class="fl">Dia recebido</label><input class="fi3" id="ls-dia" type="number" min="1" max="31" placeholder="5"></div>
+    </div>
+    <div class="ma"><button class="btn bo" onclick="cm('let-modal')">Cancelar</button>
+    <button class="btn bp" onclick="const d=document.getElementById('ls-d').value.trim(),v=parseFloat(document.getElementById('ls-v').value)||0,dia=document.getElementById('ls-dia').value;if(!d||!v){toast('Preencha os campos',true);return;}gLet().salarios.push({id:uid(),desc:d,valor:v.toFixed(2).replace('.',','),dia});saveAll();cm('let-modal');renderLeticia();toast('Salario adicionado');">Salvar</button></div>
+  </div>`);
+}
+function letOpenDix(){
+  showLetModal(`<div class="md"><h3>Divida Fixa — Leticia</h3>
+    <div class="fr"><label class="fl">Descricao</label><input class="fi3" id="ld-d" placeholder="Ex: Aluguel, Internet..."></div>
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Valor (R$)</label><input class="fi3" id="ld-v" type="number" step="0.01"></div>
+      <div class="fr" style="margin:0"><label class="fl">Dia vencimento</label><input class="fi3" id="ld-dia" type="number" min="1" max="31"></div>
+    </div>
+    <div class="fr" style="margin-top:10px"><label class="fl">Categoria</label>
+      <select class="fi3" id="ld-cat"><option>Moradia</option><option>Alimentacao</option><option>Saude</option><option>Educacao</option><option>Transporte</option><option>Assinatura</option><option>Financiamento</option><option>Outros</option></select>
+    </div>
+    <div class="ma"><button class="btn bo" onclick="cm('let-modal')">Cancelar</button>
+    <button class="btn bp" onclick="const d=document.getElementById('ld-d').value.trim(),v=parseFloat(document.getElementById('ld-v').value)||0,dia=document.getElementById('ld-dia').value,cat=document.getElementById('ld-cat').value;if(!d||!v){toast('Preencha os campos',true);return;}gLet().dividasFixas.push({id:uid(),desc:d,valor:v.toFixed(2).replace('.',','),dia,cat,status:'pendente'});saveAll();cm('let-modal');renderLeticia();toast('Divida adicionada');">Salvar</button></div>
+  </div>`);
+}
+function letOpenCart(){
+  showLetModal(`<div class="md"><h3>Cartao — Leticia</h3>
+    <div class="fr"><label class="fl">Descricao</label><input class="fi3" id="lc-d" placeholder="Ex: Curso, Compra..."></div>
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Valor parcela (R$)</label><input class="fi3" id="lc-v" type="number" step="0.01"></div>
+      <div class="fr" style="margin:0"><label class="fl">No. parcelas</label><select class="fi3" id="lc-tp"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>12</option><option>18</option><option>24</option><option>120</option></select></div>
+    </div>
+    <div class="fr2" style="margin-top:10px">
+      <div class="fr" style="margin:0"><label class="fl">Cartao</label><select class="fi3" id="lc-ct"><option value="d08">Dia 08</option><option value="d15">Dia 15</option><option value="d23">Dia 23</option><option value="d25">Dia 25</option></select></div>
+      <div class="fr" style="margin:0"><label class="fl">Mes da compra</label><input class="fi3" id="lc-mc" type="month" value="${l2m(gLet().activeMonth||'Maio 2026')}"></div>
+    </div>
+    <div class="fr" style="margin-top:10px"><label class="fl">Inicio cobranca</label><select class="fi3" id="lc-ini"><option value="mesmo">Mesmo mes</option><option value="proximo">Mes seguinte</option></select></div>
+    <div class="ma"><button class="btn bo" onclick="cm('let-modal')">Cancelar</button>
+    <button class="btn bp" onclick="const d=document.getElementById('lc-d').value.trim(),v=parseFloat(document.getElementById('lc-v').value)||0,tp=parseInt(document.getElementById('lc-tp').value),ct=document.getElementById('lc-ct').value,mc=m2l(document.getElementById('lc-mc').value),ini=document.getElementById('lc-ini').value;if(!d||!v){toast('Preencha os campos',true);return;}gLet().installments.push({id:uid(),desc:d,vp:v,tp,cartao:ct,mc,ini});saveAll();cm('let-modal');renderLeticia();toast('Cartao adicionado');">Salvar</button></div>
+  </div>`);
+}
+function letOpenAp(){
+  showLetModal(`<div class="md"><h3>Aporte — Leticia</h3>
+    <div class="fr"><label class="fl">Descricao</label><input class="fi3" id="la-d" placeholder="Ex: Nubank, Poupanca..."></div>
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Valor (R$)</label><input class="fi3" id="la-v" type="number" step="0.01"></div>
+      <div class="fr" style="margin:0"><label class="fl">Mes</label><input class="fi3" id="la-m" type="month" value="${l2m(S.activeMonth)}"></div>
+    </div>
+    <div class="ma"><button class="btn bo" onclick="cm('let-modal')">Cancelar</button>
+    <button class="btn bp" onclick="const d=document.getElementById('la-d').value.trim(),v=parseFloat(document.getElementById('la-v').value)||0,m=m2l(document.getElementById('la-m').value);if(!d||!v){toast('Preencha os campos',true);return;}gLet().aportes.push({id:uid(),d,v,m});saveAll();cm('let-modal');renderLeticia();toast('Aporte adicionado');">Salvar</button></div>
+  </div>`);
+}
+function showLetModal(html){
+  let o=document.getElementById('let-modal');
+  if(!o){o=document.createElement('div');o.id='let-modal';o.className='mo';o.onclick=ev=>{if(ev.target===o)o.classList.remove('open');};document.body.appendChild(o);}
+  o.innerHTML=html;o.classList.add('open');o.querySelector('input')?.focus();
+}
+
+// ══════════════════════════════════════════════
+// CASAL — NOS DUAS
+// ══════════════════════════════════════════════
+function gCasal(){ if(!S.casal) S.casal={metas:[],divConj:[],aportes:[],notas:''}; return S.casal; }
+
+function renderCasal(){
+  const e=document.getElementById('casal-cnt'); if(!e) return;
+  const C=gCasal();
+  const L=gLet();
+  // Ana dados
+  const anaRec=(S.salarios[S.activeMonth]||[]).reduce((s,x)=>s+pv(x.valor),0);
+  const anaDiv=(S.dividasFixas[S.activeMonth]||[]).reduce((s,x)=>s+pv(x.valor),0)+
+    S.installments.filter(it=>{const ms=it.ini==='proximo'?addM(it.mc,1):it.mc;return mi(S.activeMonth)>=mi(ms)&&mi(S.activeMonth)<=mi(addM(ms,it.tp-1));}).reduce((s,i)=>s+i.vp,0);
+  const anaInv=(S.aportes||[]).reduce((s,a)=>s+a.v,0);
+  const anaSaldo=anaRec-anaDiv;
+  // Leticia dados
+  const letRec=L.salarios.reduce((s,x)=>s+pv(x.valor),0);
+  const letDiv=L.dividasFixas.reduce((s,x)=>s+pv(x.valor),0)+L.installments.reduce((s,x)=>s+x.vp,0);
+  const letInv=L.aportes.reduce((s,a)=>s+a.v,0);
+  const letSaldo=letRec-letDiv;
+  // Casal total
+  const totalRec=anaRec+letRec;
+  const totalDiv2=anaDiv+letDiv;
+  const totalInv2=anaInv+letInv;
+  const totalSaldo=anaSaldo+letSaldo;
+  const metas=C.metas||[];
+  const apsC=C.aportes||[];
+  const totalApsC=apsC.reduce((s,a)=>s+a.v,0);
+
+  e.innerHTML=`
+  <div class="sec-header">
+    <div>
+      <div class="sec-name" style="background:linear-gradient(90deg,#a020c8,#e8529a);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Nos Duas</div>
+      <div class="sec-sub">Saude financeira do casal</div>
+    </div>
+    <div style="display:flex;gap:7px">
+      <button class="btn" style="font-size:.71rem;padding:5px 10px;background:#f0d6f8;color:#a020c8;border:none" onclick="casalOpenMeta()">+ Meta conjunta</button>
+      <button class="btn bp" style="font-size:.71rem;padding:5px 10px" onclick="casalOpenAp()">+ Aporte conjunto</button>
+    </div>
+  </div>
+
+  <!-- KPIs CONJUNTOS -->
+  <div class="kpi-grid" style="margin-bottom:20px">
+    <div class="kpi accent">
+      <div class="kpi-l">Renda conjunta</div>
+      <div class="kpi-v">${fmt(totalRec)}</div>
+      <div class="kpi-s">soma das duas</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-l">Dividas totais</div>
+      <div class="kpi-v" style="color:var(--r)">${fmt(totalDiv2)}</div>
+      <div class="kpi-s">${totalRec>0?Math.round(totalDiv2/totalRec*100):0}% da renda</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-l">Saldo conjunto</div>
+      <div class="kpi-v" style="color:${totalSaldo>=0?'var(--g)':'var(--r)'}">${fmt(totalSaldo)}</div>
+      <div class="kpi-s">${totalSaldo>=0?'positivo':'negativo'}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-l">Investimentos juntas</div>
+      <div class="kpi-v" style="color:#a020c8">${fmt(totalInv2+totalApsC)}</div>
+      <div class="kpi-s">individual + conjunto</div>
+    </div>
+  </div>
+
+  <!-- COMPARATIVO ANA x LETICIA -->
+  <div class="panel" style="margin-bottom:14px">
+    <h3>Comparativo financeiro</h3>
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.83rem">
+      <thead><tr>
+        <th style="font-family:var(--mo);font-size:.58rem;color:var(--mu);padding:7px 12px;text-align:left;border-bottom:1px solid var(--bor)">Indicador</th>
+        <th style="font-family:var(--mo);font-size:.58rem;color:#a020c8;padding:7px 12px;text-align:right;border-bottom:1px solid var(--bor)">Ana</th>
+        <th style="font-family:var(--mo);font-size:.58rem;color:#c0407a;padding:7px 12px;text-align:right;border-bottom:1px solid var(--bor)">Leticia</th>
+        <th style="font-family:var(--mo);font-size:.58rem;color:var(--mu);padding:7px 12px;text-align:right;border-bottom:1px solid var(--bor)">Total</th>
+      </tr></thead>
+      <tbody>
+        ${[
+          {l:'Receita',a:anaRec,lt:letRec,t:totalRec,c:'var(--g)'},
+          {l:'Dividas',a:anaDiv,lt:letDiv,t:totalDiv2,c:'var(--r)'},
+          {l:'Saldo livre',a:anaSaldo,lt:letSaldo,t:totalSaldo,c:totalSaldo>=0?'var(--g)':'var(--r)'},
+          {l:'Investimentos',a:anaInv,lt:letInv,t:anaInv+letInv,c:'#a020c8'},
+          {l:'% Comprometido',a:anaRec>0?Math.round(anaDiv/anaRec*100):0,lt:letRec>0?Math.round(letDiv/letRec*100):0,t:totalRec>0?Math.round(totalDiv2/totalRec*100):0,isPct:true},
+        ].map(x=>`<tr>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--bor);font-weight:600">${x.l}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);font-size:.82rem;color:#a020c8">${x.isPct?x.a+'%':fmt(x.a)}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);font-size:.82rem;color:#c0407a">${x.isPct?x.lt+'%':fmt(x.lt)}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);font-size:.82rem;font-weight:600;color:${x.c||'var(--tx)'}">${x.isPct?x.t+'%':fmt(x.t)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- GRAFICO COMPARATIVO -->
+  <div class="grid2">
+    <div class="panel">
+      <h3>Distribuicao de renda</h3>
+      ${casalBarChart(anaRec,anaDiv,anaSaldo,letRec,letDiv,letSaldo)}
+      <div style="display:flex;gap:14px;margin-top:8px;justify-content:center">
+        <span style="font-family:var(--mo);font-size:.67rem;color:#a020c8">■ Ana</span>
+        <span style="font-family:var(--mo);font-size:.67rem;color:#e8529a">■ Leticia</span>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Potencial de investimento</h3>
+      ${casalInvChart(anaRec,anaDiv,letRec,letDiv,totalInv2+totalApsC)}
+      <div style="margin-top:12px">
+        <div class="row-item"><div class="dot" style="background:#a020c8"></div><span style="flex:1;color:var(--mu)">Ana investe</span><span style="font-family:var(--mo);font-size:.8rem;font-weight:600;color:#a020c8">${fmt(anaInv)}</span></div>
+        <div class="row-item"><div class="dot" style="background:#e8529a"></div><span style="flex:1;color:var(--mu)">Leticia investe</span><span style="font-family:var(--mo);font-size:.8rem;font-weight:600;color:#e8529a">${fmt(letInv)}</span></div>
+        <div class="row-item"><div class="dot" style="background:#6b2d9a"></div><span style="flex:1;color:var(--mu)">Investimento conjunto</span><span style="font-family:var(--mo);font-size:.8rem;font-weight:600;color:#6b2d9a">${fmt(totalApsC)}</span></div>
+        ${totalApsC>0?`<div style="margin-top:10px;padding:10px;background:#f9f0ff;border-radius:8px">
+          <div style="font-family:var(--mo);font-size:.59rem;color:var(--mu);text-transform:uppercase;margin-bottom:8px">Projecao conjunta 105% CDI</div>
+          ${[{l:'1 ano',m:12},{l:'5 anos',m:60},{l:'10 anos',m:120}].map(p=>{const v=projCompound(totalApsC,CDI_AA*1.05,p.m),g=v-totalApsC;return`<div style="display:flex;justify-content:space-between;font-size:.8rem;padding:3px 0"><span style="color:var(--mu)">${p.l}</span><span style="font-family:var(--mo);font-weight:600;color:#a020c8">${fmt(v)} <span style="font-size:.65rem;color:var(--mu)">+${fmt(g)}</span></span></div>`;}).join('')}
+        </div>`:''}
+      </div>
+    </div>
+  </div>
+
+  <!-- METAS DO CASAL -->
+  <div class="panel" style="margin-bottom:14px">
+    <h3>Metas a dois <span style="font-family:var(--mo);font-size:.65rem;color:var(--mu);font-weight:400">${metas.length} meta${metas.length!==1?'s':''}</span><button onclick="casalOpenMeta()">+ Add</button></h3>
+    ${metas.length===0?'<div style="font-size:.81rem;color:var(--mu);font-style:italic">Nenhuma meta conjunta ainda. Criem seus objetivos a dois!</div>':''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${metas.map(m=>{
+        const pct=m.alvo>0?Math.min(100,Math.round((m.atual||0)/m.alvo*100)):0;
+        const win=pct>=100;
+        const cor='linear-gradient(90deg,#a020c8,#e8529a)';
+        return `<div class="cmeta${win?' win':''}">
+          ${win?`<div style="font-family:var(--mo);font-size:.6rem;background:linear-gradient(90deg,#a020c8,#e8529a);color:#fff;padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:6px">Conquistada!</div>`:''}
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+            <div style="font-weight:700;font-size:.87rem">${m.nome}</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-family:var(--mo);font-size:1rem;font-weight:600;background:linear-gradient(90deg,#a020c8,#e8529a);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${pct}%</span>
+              <button class="db" onclick="gCasal().metas=gCasal().metas.filter(x=>x.id!=='${m.id}');renderCasal()">x</button>
+            </div>
+          </div>
+          ${m.tipo!=='livre'?`
+          <div style="height:6px;background:var(--bor);border-radius:99px;overflow:hidden;margin-bottom:5px">
+            <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#a020c8,#e8529a);border-radius:99px;transition:width .5s"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:.67rem;color:var(--mu)">
+            <span>${m.tipo==='dinheiro'?fmt(m.atual||0):m.atual||0} ${m.tipo==='dinheiro'?'guardados':'de '+(m.alvo||0)}</span>
+            <span>Meta: ${m.tipo==='dinheiro'?fmt(m.alvo):m.alvo}</span>
+          </div>
+          ${!win?`<div style="margin-top:7px;display:flex;gap:5px"><input id="cm-${m.id}" type="number" step="0.01" class="fi3" style="padding:4px 7px;font-size:.73rem" placeholder="Adicionar..."><button class="btn bp" style="padding:4px 9px;font-size:.7rem" onclick="const i=document.getElementById('cm-${m.id}');const v=parseFloat(i.value)||0;if(v){const mt=gCasal().metas.find(x=>x.id==='${m.id}');if(mt){mt.atual=(mt.atual||0)+v;i.value='';saveAll();renderCasal();}}">+</button></div>`:''}`
+          :`<div style="font-size:.79rem;color:var(--mu)">${m.desc||''}</div>
+          <select class="fi3" style="margin-top:7px;width:auto;padding:3px 7px;font-size:.73rem" onchange="const mt=gCasal().metas.find(x=>x.id==='${m.id}');if(mt){mt.status=this.value;saveAll();renderCasal();}">
+            <option value="andamento" ${(m.status||'andamento')==='andamento'?'selected':''}>Em andamento</option>
+            <option value="concluida" ${m.status==='concluida'?'selected':''}>Concluida</option>
+          </select>`}
+          ${m.prazo?`<div style="font-family:var(--mo);font-size:.64rem;color:var(--mu);margin-top:5px">Prazo: ${m.prazo.split('-').reverse().slice(0,2).join('/')}</div>`:''}
+          ${m.nota?`<div style="font-size:.75rem;color:var(--mu);font-style:italic;margin-top:3px">"${m.nota}"</div>`:''}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  <!-- APORTES CONJUNTOS -->
+  <div class="panel" style="margin-bottom:14px">
+    <h3>Caixinha conjunta / Aportes a dois <span style="font-family:var(--mo);font-size:.7rem;color:#a020c8;margin-left:8px">${fmt(totalApsC)}</span><button onclick="casalOpenAp()">+ Add</button></h3>
+    ${apsC.length===0?'<div style="font-size:.81rem;color:var(--mu);font-style:italic">Nenhum aporte conjunto ainda.</div>':
+    apsC.map(a=>`<div class="row-item">
+      <div class="dot" style="background:linear-gradient(135deg,#a020c8,#e8529a)"></div>
+      <div style="flex:1"><div style="font-weight:600">${a.d}</div><div style="font-family:var(--mo);font-size:.64rem;color:var(--mu)">${a.m||''} · Ana: ${fmt(a.ana||0)} · Leticia: ${fmt(a.let||0)}</div></div>
+      <span style="font-family:var(--mo);font-size:.82rem;font-weight:600;color:#a020c8">+${fmt(a.v)}</span>
+      <button class="db" onclick="gCasal().aportes=gCasal().aportes.filter(x=>x.id!=='${a.id}');saveAll();renderCasal()">x</button>
+    </div>`).join('')}
+  </div>`;
+}
+
+function casalBarChart(aR,aD,aS,lR,lD,lS){
+  const max=Math.max(aR,lR,1);
+  const items=[
+    {l:'Receita',a:aR,b:lR},{l:'Dividas',a:aD,b:lD},{l:'Saldo',a:Math.abs(aS),b:Math.abs(lS)}
+  ];
+  return `<svg viewBox="0 0 260 100" style="width:100%;height:100px">
+    ${items.map((x,i)=>{
+      const bw=30,gap=8,pair=bw*2+gap,space=20,xp=i*(pair+space)+10;
+      const ha=max>0?Math.round((x.a/max)*80):0,hb=max>0?Math.round((x.b/max)*80):0;
+      return `<g>
+        <rect x="${xp}" y="${90-ha}" width="${bw}" height="${ha}" rx="3" fill="#a020c8" opacity=".85"/>
+        <rect x="${xp+bw+gap}" y="${90-hb}" width="${bw}" height="${hb}" rx="3" fill="#e8529a" opacity=".85"/>
+        <text x="${xp+bw}" y="98" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#8a8478">${x.l}</text>
+      </g>`;
+    }).join('')}
+  </svg>`;
+}
+function casalInvChart(aR,aD,lR,lD,totalInv){
+  const potA=Math.max(0,aR-aD),potL=Math.max(0,lR-lD),potTotal=potA+potL;
+  const max=Math.max(potTotal,totalInv,1);
+  return `<svg viewBox="0 0 200 80" style="width:100%;height:80px">
+    <rect x="10" y="${70-Math.round((potA/max)*60)}" width="50" height="${Math.round((potA/max)*60)}" rx="4" fill="#a020c8" opacity=".8"/>
+    <rect x="75" y="${70-Math.round((potL/max)*60)}" width="50" height="${Math.round((potL/max)*60)}" rx="4" fill="#e8529a" opacity=".8"/>
+    <rect x="140" y="${70-Math.round((totalInv/max)*60)}" width="50" height="${Math.round((totalInv/max)*60)}" rx="4" fill="#6b2d9a" opacity=".85"/>
+    <text x="35" y="78" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#8a8478">Pot.Ana</text>
+    <text x="100" y="78" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#8a8478">Pot.Let</text>
+    <text x="165" y="78" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#8a8478">Investido</text>
+  </svg>`;
+}
+
+function casalOpenMeta(){
+  showCasalModal(`<div class="md"><h3>Nova meta conjunta</h3>
+    <div class="fr"><label class="fl">Nome da meta</label><input class="fi3" id="cm-n" placeholder="Ex: Viagem juntas, Apartamento..."></div>
+    <div class="fr"><label class="fl">Tipo</label><select class="fi3" id="cm-t"><option value="dinheiro">Dinheiro (R$)</option><option value="percentual">Percentual / Habito</option><option value="livre">Livre</option></select></div>
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Meta (valor/numero)</label><input class="fi3" id="cm-a" type="number" step="0.01" placeholder="0"></div>
+      <div class="fr" style="margin:0"><label class="fl">Atual</label><input class="fi3" id="cm-c" type="number" step="0.01" placeholder="0"></div>
+    </div>
+    <div class="fr" style="margin-top:10px"><label class="fl">Descricao</label><input class="fi3" id="cm-d" placeholder="Detalhes..."></div>
+    <div class="fr"><label class="fl">Prazo</label><input class="fi3" id="cm-p" type="month"></div>
+    <div class="fr"><label class="fl">Motivacao</label><input class="fi3" id="cm-nota" placeholder="Por que essa meta e importante?"></div>
+    <div class="ma"><button class="btn bo" onclick="cm('casal-modal')">Cancelar</button>
+    <button class="btn bp" onclick="const n=document.getElementById('cm-n').value.trim(),t=document.getElementById('cm-t').value,a=parseFloat(document.getElementById('cm-a').value)||0,c=parseFloat(document.getElementById('cm-c').value)||0,d=document.getElementById('cm-d').value.trim(),p=document.getElementById('cm-p').value,nota=document.getElementById('cm-nota').value.trim();if(!n){toast('Preencha o nome',true);return;}gCasal().metas.push({id:uid(),nome:n,tipo:t,alvo:a,atual:c,desc:d,prazo:p,nota});saveAll();cm('casal-modal');renderCasal();toast('Meta conjunta criada');">Salvar</button></div>
+  </div>`);
+}
+function casalOpenAp(){
+  showCasalModal(`<div class="md"><h3>Aporte conjunto</h3>
+    <div class="fr"><label class="fl">Descricao</label><input class="fi3" id="ca-d" placeholder="Ex: Caixinha viagem, Reserva casal..."></div>
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Parte da Ana (R$)</label><input class="fi3" id="ca-a" type="number" step="0.01" placeholder="0" oninput="const a=parseFloat(this.value)||0,b=parseFloat(document.getElementById('ca-l')?.value)||0;const t=document.getElementById('ca-t');if(t)t.value=(a+b).toFixed(2);"></div>
+      <div class="fr" style="margin:0"><label class="fl">Parte da Leticia (R$)</label><input class="fi3" id="ca-l" type="number" step="0.01" placeholder="0" oninput="const a=parseFloat(document.getElementById('ca-a')?.value)||0,b=parseFloat(this.value)||0;const t=document.getElementById('ca-t');if(t)t.value=(a+b).toFixed(2);"></div>
+    </div>
+    <div class="fr" style="margin-top:10px"><label class="fl">Total calculado</label><input class="fi3" id="ca-t" type="number" step="0.01" placeholder="0" readonly style="background:#f0f0f0;opacity:.7"></div>
+    <div class="fr"><label class="fl">Mes</label><input class="fi3" id="ca-m" type="month" value="${l2m(S.activeMonth)}"></div>
+    <div class="ma"><button class="btn bo" onclick="cm('casal-modal')">Cancelar</button>
+    <button class="btn bp" onclick="const d=document.getElementById('ca-d').value.trim(),ana=parseFloat(document.getElementById('ca-a').value)||0,let_=parseFloat(document.getElementById('ca-l').value)||0,m=m2l(document.getElementById('ca-m').value);if(!d||(ana+let_)===0){toast('Preencha os campos',true);return;}gCasal().aportes.push({id:uid(),d,v:ana+let_,ana,let:let_,m});saveAll();cm('casal-modal');renderCasal();toast('Aporte adicionado');">Salvar</button></div>
+  </div>`);
+}
+function showCasalModal(html){
+  let o=document.getElementById('casal-modal');
+  if(!o){o=document.createElement('div');o.id='casal-modal';o.className='mo';o.onclick=ev=>{if(ev.target===o)o.classList.remove('open');};document.body.appendChild(o);}
+  o.innerHTML=html;o.classList.add('open');o.querySelector('input')?.focus();
+}
+
+// ══════════════════════════════════════════════
+// DIVIDAS CONJUNTAS
+// ══════════════════════════════════════════════
+function renderDivConj(){
+  const e=document.getElementById('divconj-cnt'); if(!e) return;
+  const C=gCasal();
+  const dc=C.divConj||[];
+  const totalDC=dc.reduce((s,d)=>s+(d.valor||0),0);
+  const totalAna=dc.reduce((s,d)=>s+(d.valor||0)*((d.pctAna||50)/100),0);
+  const totalLet=dc.reduce((s,d)=>s+(d.valor||0)*((100-(d.pctAna||50))/100),0);
+  const pagas=dc.filter(d=>d.status==='pago').length;
+
+  e.innerHTML=`
+  <div class="sec-header">
+    <div>
+      <div class="sec-name">Dividas Conjuntas</div>
+      <div class="sec-sub">O que pagamos juntas</div>
+    </div>
+    <button class="btn bp" style="font-size:.71rem;padding:5px 10px" onclick="dcOpen()">+ Adicionar divida</button>
+  </div>
+
+  <!-- KPIs -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+    <div class="kpi accent">
+      <div class="kpi-l">Total conjunto</div>
+      <div class="kpi-v">${fmt(totalDC)}</div>
+      <div class="kpi-s">${dc.length} item${dc.length!==1?'s':''}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-l">Parte da Ana</div>
+      <div class="kpi-v" style="color:#a020c8">${fmt(totalAna)}</div>
+      <div class="kpi-s">${totalDC>0?Math.round(totalAna/totalDC*100):0}% do total</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-l">Parte da Leticia</div>
+      <div class="kpi-v" style="color:#e8529a">${fmt(totalLet)}</div>
+      <div class="kpi-s">${totalDC>0?Math.round(totalLet/totalDC*100):0}% do total</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-l">Pagas</div>
+      <div class="kpi-v" style="color:var(--g)">${pagas}/${dc.length}</div>
+      <div class="kpi-s">${dc.length>0?Math.round(pagas/dc.length*100):0}% quitadas</div>
+    </div>
+  </div>
+
+  <!-- BARRA DE DIVISAO -->
+  ${totalDC>0?`<div class="panel" style="margin-bottom:14px">
+    <h3>Divisao do total</h3>
+    <div class="dc-bar" style="height:14px;border-radius:99px;overflow:hidden;margin-bottom:10px">
+      <div class="dc-ana" style="width:${Math.round(totalAna/totalDC*100)}%;transition:width .5s"></div>
+      <div class="dc-let" style="width:${Math.round(totalLet/totalDC*100)}%;transition:width .5s"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:50%;background:#a020c8"></div><span style="font-family:var(--mono);font-size:.75rem">Ana: ${fmt(totalAna)}</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:50%;background:#e8529a"></div><span style="font-family:var(--mono);font-size:.75rem">Leticia: ${fmt(totalLet)}</span></div>
+    </div>
+  </div>`:''}
+
+  <!-- TABELA DE DIVIDAS CONJUNTAS -->
+  <div class="panel">
+    <h3>Lista de dividas</h3>
+    ${dc.length===0?'<div style="font-size:.81rem;color:var(--mu);font-style:italic">Nenhuma divida conjunta cadastrada.</div>':''}
+    ${dc.length>0?`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.83rem">
+      <thead><tr>
+        <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;text-align:left;border-bottom:1px solid var(--bor)">Descricao</th>
+        <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Valor total</th>
+        <th style="font-family:var(--mo);font-size:.57rem;color:#a020c8;padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Ana</th>
+        <th style="font-family:var(--mo);font-size:.57rem;color:#e8529a;padding:6px 10px;text-align:right;border-bottom:1px solid var(--bor)">Leticia</th>
+        <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;text-align:center;border-bottom:1px solid var(--bor)">Divisao</th>
+        <th style="font-family:var(--mo);font-size:.57rem;color:var(--mu);padding:6px 10px;text-align:left;border-bottom:1px solid var(--bor)">Status</th>
+        <th style="width:24px;border-bottom:1px solid var(--bor)"></th>
+      </tr></thead>
+      <tbody>
+        ${dc.map(d=>{
+          const pA=d.pctAna||50,pL=100-pA;
+          const vA=(d.valor||0)*(pA/100),vL=(d.valor||0)*(pL/100);
+          const stCor=d.status==='pago'?'var(--g)':d.status==='atrasado'?'var(--r)':'var(--w)';
+          const stBg=d.status==='pago'?'#f0fff4':d.status==='atrasado'?'#fff5f5':'var(--wl)';
+          return `<tr style="${d.status==='pago'?'background:#f0fff4;':''}">
+            <td style="padding:9px 10px;border-bottom:1px solid var(--bor);font-weight:600">
+              ${d.desc}
+              ${d.recorrente?'<span class="pill pill-y" style="font-size:.57rem;margin-left:5px">mensal</span>':''}
+              ${d.obs?`<div style="font-family:var(--mo);font-size:.63rem;color:var(--mu)">${d.obs}</div>`:''}
+            </td>
+            <td style="padding:9px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);font-weight:600">${fmt(d.valor||0)}</td>
+            <td style="padding:9px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);color:#a020c8;font-weight:500">${fmt(vA)}</td>
+            <td style="padding:9px 10px;border-bottom:1px solid var(--bor);text-align:right;font-family:var(--mo);color:#e8529a;font-weight:500">${fmt(vL)}</td>
+            <td style="padding:9px 10px;border-bottom:1px solid var(--bor)">
+              <div style="display:flex;height:8px;border-radius:99px;overflow:hidden;width:80px;margin:0 auto">
+                <div style="background:#a020c8;width:${pA}%"></div>
+                <div style="background:#e8529a;width:${pL}%"></div>
+              </div>
+              <div style="font-family:var(--mo);font-size:.6rem;color:var(--mu);text-align:center;margin-top:2px">${pA}/${pL}</div>
+            </td>
+            <td style="padding:9px 10px;border-bottom:1px solid var(--bor)">
+              <select style="background:${stBg};color:${stCor};border:none;font-family:var(--mo);font-size:.65rem;padding:3px 7px;border-radius:20px;cursor:pointer;font-weight:600" onchange="const dc=gCasal().divConj.find(x=>x.id==='${d.id}');if(dc){dc.status=this.value;saveAll();renderDivConj();}">
+                <option value="pendente" ${(d.status||'pendente')==='pendente'?'selected':''}>Pendente</option>
+                <option value="pago" ${d.status==='pago'?'selected':''}>Pago</option>
+                <option value="atrasado" ${d.status==='atrasado'?'selected':''}>Atrasado</option>
+              </select>
+            </td>
+            <td style="padding:9px 10px;border-bottom:1px solid var(--bor)"><button class="db" onclick="gCasal().divConj=gCasal().divConj.filter(x=>x.id!=='${d.id}');saveAll();renderDivConj()">x</button></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+      <tfoot>
+        <tr style="background:#f9f0ff">
+          <td style="padding:9px 10px;font-weight:700;font-family:var(--mo);font-size:.8rem">Total</td>
+          <td style="padding:9px 10px;text-align:right;font-family:var(--mo);font-weight:700">${fmt(totalDC)}</td>
+          <td style="padding:9px 10px;text-align:right;font-family:var(--mo);font-weight:700;color:#a020c8">${fmt(totalAna)}</td>
+          <td style="padding:9px 10px;text-align:right;font-family:var(--mo);font-weight:700;color:#e8529a">${fmt(totalLet)}</td>
+          <td colspan="3"></td>
+        </tr>
+      </tfoot>
+    </table></div>`:''}
+  </div>`;
+}
+
+function dcOpen(){
+  showDCModal(`<div class="md"><h3>Nova divida conjunta</h3>
+    <div class="fr"><label class="fl">Descricao</label><input class="fi3" id="dc-d" placeholder="Ex: Aluguel, Conta de luz, Mercado..."></div>
+    <div class="fr2">
+      <div class="fr" style="margin:0"><label class="fl">Valor total (R$)</label><input class="fi3" id="dc-v" type="number" step="0.01" placeholder="0" oninput="dcCalc()"></div>
+      <div class="fr" style="margin:0"><label class="fl">Divisao Ana % (0-100)</label><input class="fi3" id="dc-pct" type="number" min="0" max="100" value="50" oninput="dcCalc()"></div>
+    </div>
+    <div class="fr2" style="margin-top:10px">
+      <div class="fr" style="margin:0"><label class="fl">Parte Ana</label><input class="fi3" id="dc-va" readonly style="background:#f0f0f0;color:#a020c8;font-weight:600" placeholder="R$ 0,00"></div>
+      <div class="fr" style="margin:0"><label class="fl">Parte Leticia</label><input class="fi3" id="dc-vl" readonly style="background:#f0f0f0;color:#e8529a;font-weight:600" placeholder="R$ 0,00"></div>
+    </div>
+    <div class="fr" style="margin-top:10px"><label class="fl">Categoria</label>
+      <select class="fi3" id="dc-cat"><option>Moradia</option><option>Alimentacao</option><option>Transporte</option><option>Lazer</option><option>Saude</option><option>Servicos</option><option>Outros</option></select>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <label style="display:flex;align-items:center;gap:6px;font-size:.82rem;cursor:pointer"><input type="checkbox" id="dc-rec" style="accent-color:#a020c8"> Recorrente (mensal)</label>
+    </div>
+    <div class="fr" style="margin-top:10px"><label class="fl">Observacoes</label><input class="fi3" id="dc-obs" placeholder="Opcional..."></div>
+    <div class="ma"><button class="btn bo" onclick="cm('dc-modal')">Cancelar</button>
+    <button class="btn bp" onclick="dcSave()">Salvar</button></div>
+  </div>`);
+}
+function dcCalc(){
+  const v=parseFloat(document.getElementById('dc-v')?.value)||0;
+  const pct=parseFloat(document.getElementById('dc-pct')?.value)||50;
+  const va=document.getElementById('dc-va'),vl=document.getElementById('dc-vl');
+  if(va)va.value='R$ '+(v*pct/100).toFixed(2).replace('.',',');
+  if(vl)vl.value='R$ '+(v*(100-pct)/100).toFixed(2).replace('.',',');
+}
+function dcSave(){
+  const d=document.getElementById('dc-d')?.value.trim();
+  const v=parseFloat(document.getElementById('dc-v')?.value)||0;
+  const pct=parseFloat(document.getElementById('dc-pct')?.value)||50;
+  const cat=document.getElementById('dc-cat')?.value||'Outros';
+  const rec=document.getElementById('dc-rec')?.checked||false;
+  const obs=document.getElementById('dc-obs')?.value.trim()||'';
+  if(!d||!v){toast('Preencha descricao e valor',true);return;}
+  if(!S.casal)S.casal={metas:[],divConj:[],aportes:[],notas:''};
+  if(!S.casal.divConj)S.casal.divConj=[];
+  S.casal.divConj.push({id:uid(),desc:d,valor:v,pctAna:pct,cat,recorrente:rec,obs,status:'pendente'});
+  saveAll();cm('dc-modal');renderDivConj();toast('Divida conjunta adicionada');
+}
+function showDCModal(html){
+  let o=document.getElementById('dc-modal');
+  if(!o){o=document.createElement('div');o.id='dc-modal';o.className='mo';o.onclick=ev=>{if(ev.target===o)o.classList.remove('open');};document.body.appendChild(o);}
+  o.innerHTML=html;o.classList.add('open');setTimeout(()=>{dcCalc();o.querySelector('input')?.focus();},50);
+}
 
 // ── INIT ──
 loadSt(()=>{
